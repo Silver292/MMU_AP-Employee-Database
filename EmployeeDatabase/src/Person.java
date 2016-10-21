@@ -100,8 +100,8 @@ public class Person {
 	 */
 	@Override
 	public String toString() {
-		return "Person [name=" + name + ", gender=" + gender + ", natInscNo=" + natInscNo + ", dob=" + dob
-				+ ", address=" + address + ", postcode=" + postcode + "]";
+		return "Name: " + name + "\n\tGender: " + gender + "\n\tNIN: " + natInscNo + "\n\tD.O.B: " + dob
+				+ "\n\tAddress: " + address + "\n\tPostcode: " + postcode;
 	}
 	
 	
