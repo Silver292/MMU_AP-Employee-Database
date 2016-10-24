@@ -24,8 +24,13 @@ public class EmployeeDAO {
 		return s;
 	}
 	
-	public void closeConnection() throws SQLException {
-		c.close();
+	public void closeConnection() {
+		try {
+			s.close();
+			c.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public ArrayList<Employee> selectAllEmployees() {
@@ -49,8 +54,7 @@ public class EmployeeDAO {
 				employees.add(emp);
 			}
 			
-			s.close();
-			r.close();
+			this.closeConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -79,6 +83,7 @@ public class EmployeeDAO {
 			emp.setEmail(r.getString("Email"));
 		}
 
+		this.closeConnection();
 		return emp;
 	}
 	
@@ -96,6 +101,8 @@ public class EmployeeDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			this.closeConnection();
 		}
 	}
 	
@@ -122,6 +129,8 @@ public class EmployeeDAO {
 			return true;
 		} catch (SQLException e) {
 			return false;
+		} finally {
+			this.closeConnection();
 		}
 	}
 	
@@ -136,6 +145,8 @@ public class EmployeeDAO {
 			return true;
 		} catch (SQLException e) {
 			return false;
+		} finally {
+			this.closeConnection();
 		}
 		
 	}
