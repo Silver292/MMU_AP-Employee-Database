@@ -143,5 +143,29 @@ public class EmployeeDAO {
 		}
 		
 	}
+
+	public Employee selectEmployeeById(int id) throws SQLException{
+		s = this.getConnection();
+		String sql = String.format("SELECT * FROM employees WHERE ID = %d", id);
+		Employee emp = null;
+		r = s.executeQuery(sql);
+		
+		if (r.next()) {
+			emp = new Employee();
+			emp.setId(Integer.toString(r.getInt("ID")));
+			emp.setName(r.getString("Name"));
+			emp.setGender(r.getString("Gender").charAt(0));
+			emp.setDob(r.getString("DOB"));
+			emp.setAddress(r.getString("Address"));
+			emp.setPostcode(r.getString("Postcode"));
+			emp.setNatInscNo(r.getString("NIN"));
+			emp.setTitle(r.getString("JobTitle"));
+			emp.setStartDate(r.getString("Salary"));
+			emp.setSalary("StartDate");
+			emp.setEmail(r.getString("Email"));
+		}
+		this.closeConnection();
+		return emp;
+	}
 	
 }
