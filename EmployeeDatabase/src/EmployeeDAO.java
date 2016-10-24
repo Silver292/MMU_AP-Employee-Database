@@ -127,7 +127,7 @@ public class EmployeeDAO {
 		}
 	}
 	
-	public boolean deleteEmployeeById(Employee emp, String id) {
+	public boolean deleteEmployeeById(String id) {
 		// convert string id to an integer for use with database
 		int empID = Integer.parseInt(id);
 		String sql = String.format("DELETE FROM employees WHERE ID = %d;", empID);
