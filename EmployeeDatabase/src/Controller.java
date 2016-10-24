@@ -54,7 +54,7 @@ public class Controller {
 		}
 		
 		// Test deleteEmployeeAtId
-		if (db.deleteEmployeeById(emp, id)) {
+		if (db.deleteEmployeeById(id)) {
 			System.out.println("SUCCESS: Employee " + emp.getName() + " at ID = " + id + " deleted.");
 		} else {
 			System.out.println("FAILURE: Employee " + emp.getName() + " at ID = " + id + " deletion failed.");
@@ -71,13 +71,7 @@ public class Controller {
 		
 
 		
-		// Close database connection
-		try {
-			db.closeConnection();
-		} catch (SQLException e1) {
-			System.out.println("closeConnection sql exception");
-			e1.printStackTrace();
-		}
+		db.closeConnection();
 	}
 
 }
