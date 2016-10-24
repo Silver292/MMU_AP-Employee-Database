@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <employees ID="1" Name="Alan Crispin" Gender="M" DOB="14-03-1960" Address="Leeds" Postcode="LS1 1HE" NIN="QQ123456C" JobTitle="Lecturer" StartDate="01-09-2010" Salary="30000" Email="alan@example.com"/>
+  <employees ID="2" Name="Fred Bloggs" Gender="M" DOB="10-05-1986" Address="Manchester" Postcode="M34 8SL" NIN="LP632185F" JobTitle="IT" StartDate="08-03-2014" Salary="16000" Email="fred@example.com"/>
+  <employees ID="8" Name="Mary Poppins" Gender="F" DOB="01-01-1949" Address="London" Postcode="SW1 6MP&#xA;SW1 6MP" NIN="MP213485D" JobTitle="Governess" StartDate="01-01-1969" Salary="1000" Email="mary@example.com"/>
+</dataset>
