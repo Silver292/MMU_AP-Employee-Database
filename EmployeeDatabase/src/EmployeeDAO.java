@@ -111,18 +111,10 @@ public class EmployeeDAO {
 		// convert string id to an integer for use with database
 		int idAsInt = Integer.parseInt(id);
 		try {
-			String sql = String.format("UPDATE employees "
-					+ "SET Name = '%s', "
-					+ "Gender = '%c', "
-					+ "DOB = '%s', "
-					+ "Address = '%s', "
-					+ "Postcode = '%s', "
-					+ "NIN = '%s', "
-					+ "JobTitle = '%s', "
-					+ "StartDate = '%s', "
-					+ "Salary = '%s', "
-					+ "Email = '%s'"
-					+ "WHERE ID = %d;", 
+			String sql = String.format("INSERT INTO EMPLOYEES "
+					+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, ID) "
+					+ "VALUES "
+					+ "('%s', '%c', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d) ;", 
 					emp.getName(), emp.getGender(), emp.getDob(), emp.getAddress(), emp.getPostcode(),
 					emp.getNatInscNo(), emp.getTitle(), emp.getStartDate(), emp.getSalary(), emp.getEmail(), idAsInt);
 			s = this.getConnection();
