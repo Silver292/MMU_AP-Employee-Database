@@ -109,7 +109,7 @@ public class EmployeeDAO {
 	
 	public boolean insertEmployeeAtID(Employee emp, String id) {
 		// convert string id to an integer for use with database
-		int empID = Integer.parseInt(id);
+		int idAsInt = Integer.parseInt(id);
 		try {
 			String sql = String.format("UPDATE employees "
 					+ "SET Name = '%s', "
@@ -124,7 +124,7 @@ public class EmployeeDAO {
 					+ "Email = '%s'"
 					+ "WHERE ID = %d;", 
 					emp.getName(), emp.getGender(), emp.getDob(), emp.getAddress(), emp.getPostcode(),
-					emp.getNatInscNo(), emp.getTitle(), emp.getStartDate(), emp.getSalary(), emp.getEmail(), empID);
+					emp.getNatInscNo(), emp.getTitle(), emp.getStartDate(), emp.getSalary(), emp.getEmail(), idAsInt);
 			s = this.getConnection();
 			s.execute(sql);
 			return true;
