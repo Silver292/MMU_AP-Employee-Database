@@ -10,19 +10,18 @@ public class EmployeeDAO {
 	Statement s;
 	ResultSet r;
 	
-	public EmployeeDAO() {
-	    try {
-	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:empdb.sqlite");
-	      s = c.createStatement();
-	    } catch ( Exception e ) {
-	      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-	      System.exit(0);
-	    }
-	}
+	public EmployeeDAO() {}
 	
-	public Statement getConnection() throws SQLException{
-		return c.createStatement();
+	public Statement getConnection() {
+		try {
+			Class.forName("org.sqlite.JDBC");
+			c = DriverManager.getConnection("jdbc:sqlite:empdb.sqlite");
+			s = c.createStatement();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return s;
 	}
 	
 	public void closeConnection() throws SQLException {
