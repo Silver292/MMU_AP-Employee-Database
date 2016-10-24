@@ -67,9 +67,10 @@ public class EmployeeDAO {
 		String sqlStatement = "SELECT * FROM employees WHERE Name = '" + name + "';";
 		s = this.getConnection();
 		r = s.executeQuery(sqlStatement);
-		Employee emp = new Employee();
+		Employee emp = null;
 		
 		while(r.next()) {
+			emp = new Employee();
 			emp.setId(Integer.toString(r.getInt("ID")));
 			emp.setName(r.getString("Name"));
 			emp.setGender(r.getString("Gender").charAt(0));
