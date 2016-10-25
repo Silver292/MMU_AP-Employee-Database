@@ -1,4 +1,3 @@
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Controller {
@@ -22,12 +21,12 @@ public class Controller {
 		String empName = "Fred Bloggs";
 		System.out.println("\nSelecting employee : " + empName);
 		// Test select employee by name
-		try {
-			emp = db.selectEmployeeByName(empName);
+		emp = db.selectEmployeeByName(empName);
+		
+		if(emp != null) {
 			System.out.println("SUCCESS: Employee " + empName + " selected.");
-		} catch (SQLException e2) {
+		} else {
 			System.out.println("FAILURE: Employee " + empName + " could not be selected.");
-			e2.printStackTrace();
 		}
 
 		// Update employee

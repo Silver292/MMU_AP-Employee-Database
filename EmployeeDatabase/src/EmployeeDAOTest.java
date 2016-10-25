@@ -6,7 +6,6 @@ import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EmployeeDAOTest {
@@ -32,19 +31,25 @@ public class EmployeeDAOTest {
 	}
 
     @Test
-	public void employeeSelectedByNameMatchesExpected() throws Exception {
+	public void selectEmployeeByNameMatchesName() throws Exception {
 		Employee emp = db.selectEmployeeByName("Fred Bloggs");
 		assertNotNull("vo shouldn't be null", emp);
 		assertEquals("Fred Bloggs", emp.getName());
-		
 	}
 
-	@Test
+    @Test
 	public void selectAllEmployeesReturnsExpected() {
 		ArrayList<Employee> empList = new ArrayList<Employee>();
 		empList = db.selectAllEmployees();
 		assertNotNull(empList);
 		assertEquals(3, empList.size());
+	}
+	
+	@Test
+	public void selectEmployeeAtIdReturnsEmployee() throws Exception {
+		Employee testEmp = db.selectEmployeeById(1);
+		assertNotNull("Should not be null", testEmp);
+		assertEquals("Should match name", "Alan Crispin", testEmp.getName());
 	}
 	
 	@Test
@@ -74,6 +79,16 @@ public class EmployeeDAOTest {
 		assertTrue(db.insertEmployeeAtID(tempEmp, "16"));
 		assertNotNull("Returns an employee", selectedEmp = db.selectEmployeeById(16));
 		assertEquals(tempEmp.getName(), selectedEmp.getName());
+	}
+
+	@Test
+	public void checkConnectionsAreClosedAfterOperation() throws Exception {
+		Employee emp = db.selectEmployeeById(1);
+		ArrayList<Employee> employees = db.selectAllEmployees();
+		assertTrue("result set should be closed", db.r.isClosed());
+		assertTrue("statement should be closed", db.s.isClosed());
+		assertTrue("prepared statement should be closed", db.pstmt.isClosed());
+		assertTrue("connection should be closed", db.c.isClosed());
 	}
 
 	private Employee getTestEmployee() {
