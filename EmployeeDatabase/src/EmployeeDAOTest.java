@@ -50,6 +50,17 @@ public class EmployeeDAOTest {
 		Employee testEmp = db.selectEmployeeById(1);
 		assertNotNull("Should not be null", testEmp);
 		assertEquals("Should match name", "Alan Crispin", testEmp.getName());
+		assertEquals("id should match", "1", testEmp.getId());
+		assertEquals("name should match", "Alan Crispin", testEmp.getName());
+		assertEquals("gender should match", 'M', testEmp.getGender());
+		assertEquals("dob should match", "14-03-1960", testEmp.getDob());
+		assertEquals("address should match", "Leeds", testEmp.getAddress());
+		assertEquals("postcode should match", "LS1 1HE", testEmp.getPostcode());
+		assertEquals("nin should match", "QQ123456C", testEmp.getNatInscNo());
+		assertEquals("job title should match", "Lecturer", testEmp.getTitle());
+		assertEquals("start date should match", "01-09-2010", testEmp.getStartDate());
+		assertEquals("salary should match", "30000", testEmp.getSalary());
+		assertEquals("email should match", "alan@example.com", testEmp.getEmail());
 	}
 	
 	@Test
