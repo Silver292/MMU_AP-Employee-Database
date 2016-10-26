@@ -67,7 +67,6 @@ public class EmployeeDAO {
 		return employees;
 	}
 
-	//TODO: Should use prepared statement
 	public Employee selectEmployeeByName(String name) {
 		String sqlStatement = "SELECT * FROM employees WHERE Name = ?";
 		Employee emp = null;
