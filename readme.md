@@ -1,8 +1,10 @@
 # Employee Database
 Employee Database project for Advanced Programming module of MMU Computer Science Course (Year 2)
 
-The Brief
+## The Brief
+
 You are required to produce a system that allows a user to do the following:
+
 1. Display employee records stored in the SQLite database (an employee record
 includes the data items inherited from Person as well as those in the Employee class,
 see below)
