@@ -1,0 +1,9 @@
+Add input validation to Employee(), startDate cannot be before DOB - throw IllegalArguementException?
+
+Swing interface
+
+Add updateEmployee to EmployeeDAO
+
+Add blob column to db for images
+
+command line interface?
