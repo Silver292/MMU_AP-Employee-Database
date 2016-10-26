@@ -26,13 +26,25 @@ public class EmployeeDAO {
 	}
 	
 	public void closeConnection() {
+		closeQuietly(r);
+		closeQuietly(s);
+		closeQuietly(pstmt);
+		closeQuietly(c);
+	}
+	
+	/**
+	 * Closes an <code>AutoClosable</code> unequivocally.
+	 * <br>
+	 * Equivalent to {@link java.lang.AutoClosable#close() AutoClosable.close()}, except any exceptions will be ignored
+	 * @param input -  the object to close, may be null or already closed
+	 */
+	public void closeQuietly(AutoCloseable input) {
 		try {
-			r.close();
-			s.close();
-			pstmt.close();
-			c.close();
+			if (input != null) {
+				input.close();
+			}
 		} catch (Exception e) {
-			/* Close quietly */
+			// ignored
 		}
 	}
 	
