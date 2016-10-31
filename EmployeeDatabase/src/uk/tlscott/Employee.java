@@ -1,3 +1,4 @@
+package uk.tlscott;
 public class Employee extends Person {
 
 	private String id;

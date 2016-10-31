@@ -1,3 +1,4 @@
+package uk.tlscott;
 import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;

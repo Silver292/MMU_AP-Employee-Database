@@ -1,3 +1,4 @@
+package uk.tlscott;
 
 public class Person {
 	private String name;

@@ -1,3 +1,4 @@
+package uk.tlscott;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
