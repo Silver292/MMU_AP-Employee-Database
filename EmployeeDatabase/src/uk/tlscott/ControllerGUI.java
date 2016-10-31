@@ -1,4 +1,5 @@
 package uk.tlscott;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -6,14 +7,22 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 public class ControllerGUI {
 
 	static BufferedImage image;
 	static JLabel imageLabel;
+	
+	static JButton enterButton = new JButton("Enter");
+	static JButton clearButton = new JButton("Clear");
+	static JButton backButton = new JButton("Back");
+	static JButton forwardButton = new JButton("Forward");
+	
 	
 	static JLabel titleLabel = new JLabel("Employee Information");
 	static JLabel nameLabel = new JLabel("Employee Name");                
@@ -24,7 +33,8 @@ public class ControllerGUI {
 	static JLabel emailLabel = new JLabel("Employee Email");              
 	static JLabel startDateLabel = new JLabel("Employee Start Date");     
 	static JLabel jobTitleLabel = new JLabel("Employee Title");           
-	static JLabel empIdLabel = new JLabel("Employee No");                 
+	static JLabel empIdTextLabel = new JLabel("Employee No: ");                 
+	static JLabel empIdLabel;
 	
     static JTextField nameTextBox = new JTextField(16);
     static JTextField genderTextBox = new JTextField(16);
@@ -34,8 +44,10 @@ public class ControllerGUI {
     static JTextField emailTextBox = new JTextField(16);
     static JTextField startDateTextBox = new JTextField(16);
     static JTextField jobTitleTextBox = new JTextField(16);
-    static JTextField empIdTextBox = new JTextField(16);
 	
+    static JRadioButton maleRadio = new JRadioButton("Male");
+    static JRadioButton femaleRadio = new JRadioButton("Female");
+    
 	public static void main(String[] args) {
 
 		//TODO: remove this
@@ -43,7 +55,6 @@ public class ControllerGUI {
 			image = ImageIO.read(new File("assets/default.png"));
 			imageLabel = new JLabel(new ImageIcon(image));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -73,22 +84,45 @@ public class ControllerGUI {
 							.addComponent(emailLabel)    
 							.addComponent(startDateLabel)
 							.addComponent(jobTitleLabel) 
-							.addComponent(empIdLabel)
+							.addComponent(enterButton)
 							)
 						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
 							.addComponent(titleLabel)
 							.addComponent(nameTextBox)     
-							.addComponent(genderTextBox)   
+							.addGroup(layout.createSequentialGroup()
+									.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+											.addComponent(maleRadio)
+											)
+									.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+											.addComponent(femaleRadio)    
+											)
+									)
 							.addComponent(dobTextBox)      
 							.addComponent(salaryTextBox)   
 							.addComponent(ninTextBox)      
 							.addComponent(emailTextBox)    
 							.addComponent(startDateTextBox)
 							.addComponent(jobTitleTextBox) 
-							.addComponent(empIdTextBox)    
+							.addComponent(clearButton)
 							)
-						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+								.addGroup(layout.createSequentialGroup()
+										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+												.addComponent(empIdTextLabel)
+												)
+										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+												.addComponent(empIdLabel)    
+												)
+										)
 								.addComponent(imageLabel)
+								.addGroup(layout.createSequentialGroup()
+									.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+											.addComponent(backButton)
+											)
+									.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+											.addComponent(forwardButton)
+											)
+									)
 							)
 						);
 				
@@ -103,7 +137,12 @@ public class ControllerGUI {
 	                                        )
 	                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 	                                        .addComponent(genderLabel)
-	                                        .addComponent(genderTextBox)
+	                                        .addGroup(layout.createSequentialGroup()
+	                                        		.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                                        		.addComponent(maleRadio)
+		                                        		.addComponent(femaleRadio)
+                                        				)
+	                                        		)
 	                                        )
 	                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 	                                        .addComponent(dobLabel)
@@ -130,11 +169,23 @@ public class ControllerGUI {
 	                                		.addComponent(jobTitleTextBox) 
 	                                		)                        
 	                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-	                                		.addComponent(empIdLabel)
-	                                		.addComponent(empIdTextBox)
+	                                		.addComponent(enterButton)
+	                                		.addComponent(clearButton)
 	                                		)
 	                                )
-                                .addComponent(imageLabel)
+                                .addGroup(layout.createSequentialGroup()
+	                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+	                                		.addComponent(empIdTextLabel)
+	                                		.addComponent(empIdLabel)
+	                                		)
+	                                .addComponent(imageLabel)
+	                                .addGroup(layout.createSequentialGroup()
+	                                		.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+	                                				.addComponent(backButton)
+	                                				.addComponent(forwardButton)
+	                                				)
+	                                		)
+                                		)
                         		)
                         );
                 
@@ -145,14 +196,17 @@ public class ControllerGUI {
 
 			private void setTextFields(Employee emp) {
 			    nameTextBox.setText(emp.getName());
-			    genderTextBox.setText(String.valueOf(emp.getGender()));
+			    // set gender radio button
+			    if (emp.getGender() == 'M') maleRadio.setSelected(true);
+			    else femaleRadio.setSelected(true);
+			    
 			    dobTextBox.setText(emp.getDob());
 			    salaryTextBox.setText(emp.getSalary());
 			    ninTextBox.setText(emp.getNatInscNo());
 			    emailTextBox.setText(emp.getEmail());
 			    startDateTextBox.setText(emp.getStartDate());
 			    jobTitleTextBox.setText(emp.getTitle());
-			    empIdTextBox.setText(emp.getId());
+			    empIdLabel = new JLabel(emp.getId());
 			}
 		});
 	}
