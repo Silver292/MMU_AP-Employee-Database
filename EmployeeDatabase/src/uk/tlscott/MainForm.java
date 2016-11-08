@@ -1,6 +1,5 @@
 package uk.tlscott;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class MainForm extends JFrame{
 

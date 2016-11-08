@@ -95,7 +95,9 @@ public class EmployeeDAOTest {
 
 	@Test
 	public void checkConnectionsAreClosedAfterOperation() throws Exception {
+		@SuppressWarnings("unused")
 		Employee emp = db.selectEmployeeById(1);
+		@SuppressWarnings("unused")
 		ArrayList<Employee> employees = db.selectAllEmployees();
 		assertTrue("result set should be closed", db.r.isClosed());
 		assertTrue("statement should be closed", db.s.isClosed());
