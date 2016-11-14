@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -51,9 +52,10 @@ public class ControllerGUI {
     static JTextField ninTextBox = new JTextField(16);
     static JTextField emailTextBox = new JTextField(16);
     static JTextField startDateTextBox = new JTextField(16);
-    static JTextField jobTitleTextBox = new JTextField(16);
-	
-    static JRadioButton maleRadio = new JRadioButton("Male");
+    static JTextField jobTitleTextBox  = new JTextField(16);
+    static ButtonGroup genderGroup     = new ButtonGroup();
+    
+    static JRadioButton maleRadio   = new JRadioButton("Male");
     static JRadioButton femaleRadio = new JRadioButton("Female");
     
 	public static void main(String[] args) {
@@ -84,6 +86,10 @@ public class ControllerGUI {
 				//createGroupLayout(frame);
                 
 				setGridBagLayout(frame); 
+				
+				// add radio buttons to button group
+				genderGroup.add(maleRadio);
+				genderGroup.add(femaleRadio);
 				
                 frame.pack();
                 
