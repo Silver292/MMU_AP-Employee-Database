@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -18,39 +20,43 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 public class ControllerGUI {
 
-	static Image image;
-	static JLabel imageLabel;
-	
-	static JButton enterButton = new JButton("Enter");
-	static JButton clearButton = new JButton("Clear");
-	static JButton backButton = new JButton("Back");
-	static JButton forwardButton = new JButton("Forward");
-	
-	
-	static JLabel titleLabel = new JLabel("Enter Employee Information");
-	static JLabel nameLabel = new JLabel("Employee Name");                
-	static JLabel genderLabel = new JLabel("Employee Gender");            
-	static JLabel dobLabel = new JLabel("Employee D.O.B");                
-	static JLabel salaryLabel = new JLabel("Employee Salary");            
-	static JLabel ninLabel = new JLabel("National Insurance Number");     
-	static JLabel emailLabel = new JLabel("Employee Email");              
-	static JLabel startDateLabel = new JLabel("Employee Start Date");     
-	static JLabel jobTitleLabel = new JLabel("Enter Job Title");           
-	static JLabel empIdTextLabel = new JLabel("Employee No: ");                 
-	static JLabel empIdLabel = new JLabel("");
-	
-    static JTextField nameTextBox = new JTextField(16);
-    static JTextField genderTextBox = new JTextField(16);
-    static JTextField dobTextBox = new JTextField(16);
-    static JTextField salaryTextBox = new JTextField(16);
-    static JTextField ninTextBox = new JTextField(16);
-    static JTextField emailTextBox = new JTextField(16);
+	static Image  image;
+    static JLabel imageLabel;
+    
+    static JButton enterButton   = new JButton("Enter");
+    static JButton clearButton   = new JButton("Clear");
+    static JButton backButton    = new JButton("Back");
+    static JButton forwardButton = new JButton("Forward");
+    
+    
+    static JLabel titleLabel     = new JLabel("Enter Employee Information");
+    static JLabel nameLabel      = new JLabel("Employee Name");                
+    static JLabel genderLabel    = new JLabel("Employee Gender");            
+    static JLabel dobLabel       = new JLabel("Employee D.O.B");                
+    static JLabel salaryLabel    = new JLabel("Employee Salary");            
+    static JLabel ninLabel       = new JLabel("National Insurance Number");     
+    static JLabel emailLabel     = new JLabel("Employee Email");              
+    static JLabel startDateLabel = new JLabel("Employee Start Date");     
+    static JLabel jobTitleLabel  = new JLabel("Enter Job Title");           
+    static JLabel empIdTextLabel = new JLabel("Employee No: ");                 
+    static JLabel empIdLabel     = new JLabel("");
+    
+    static JTextField nameTextBox      = new JTextField(16);
+    static JTextField genderTextBox    = new JTextField(16);
+    static JTextField dobTextBox       = new JTextField(16);
+    static JTextField salaryTextBox    = new JTextField(16);
+    static JTextField ninTextBox       = new JTextField(16);
+    static JTextField emailTextBox     = new JTextField(16);
     static JTextField startDateTextBox = new JTextField(16);
     static JTextField jobTitleTextBox  = new JTextField(16);
     static ButtonGroup genderGroup     = new ButtonGroup();
@@ -90,6 +96,44 @@ public class ControllerGUI {
 				// add radio buttons to button group
 				genderGroup.add(maleRadio);
 				genderGroup.add(femaleRadio);
+				
+				
+				// menu setup
+				JMenuBar menuBar = new JMenuBar();
+				JMenu fileMenu   = new JMenu("File");
+				JMenu recordMenu = new JMenu("Record");
+				JMenuItem exitItem = new JMenuItem("Exit");
+				JMenuItem displayItem = new JMenuItem("Display");
+				
+				// Add exit item to file menu
+				exitItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", 
+								"Exit Confirmation", JOptionPane.CANCEL_OPTION);
+						
+						if(returnValue == JOptionPane.OK_OPTION)
+							System.exit(0);
+					}
+				});
+				
+				fileMenu.add(exitItem);
+				
+				// Add display item to the Record menus
+				exitItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						//TODO: Select first employee in database and call setTextFields
+					}
+				});
+				
+				recordMenu.add(displayItem);
+				
+				menuBar.add(fileMenu);
+				menuBar.add(recordMenu);
+				
+				
+				
+				frame.setJMenuBar(menuBar);
+				
 				
                 frame.pack();
                 
@@ -151,6 +195,7 @@ public class ControllerGUI {
 	 * 
 	 * @param frame
 	 */
+	@SuppressWarnings("unused")
 	private static void createGroupLayout(MainForm frame) {
 		GroupLayout layout = new GroupLayout(frame.getContentPane());
 		frame.setLayout(layout);
