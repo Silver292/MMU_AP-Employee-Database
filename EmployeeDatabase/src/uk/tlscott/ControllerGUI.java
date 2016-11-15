@@ -85,9 +85,12 @@ public class ControllerGUI {
 				// set fonts 
 				setFonts();
 				
+				// Get an employee to display
+				Employee employee = frame.dao.selectEmployeeById(1);
+				
 				
 				// Fill text fields
-				setTextFields(frame.dao.selectEmployeeById(1));
+				setTextFields(employee);
 				
 				//createGroupLayout(frame);
                 
@@ -96,6 +99,30 @@ public class ControllerGUI {
 				// add radio buttons to button group
 				genderGroup.add(maleRadio);
 				genderGroup.add(femaleRadio);
+				
+				// Update employee fields
+				enterButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// set gender
+						char gender =  maleRadio.isSelected() ? 'M' : 'F';
+						employee.setGender(gender);
+						
+						employee.setName(nameTextBox.getText());
+						employee.setDob(dobTextBox.getText());
+						employee.setSalary(salaryTextBox.getText());
+						employee.setNatInscNo(ninTextBox.getText());
+						employee.setEmail(emailTextBox.getText());
+						employee.setStartDate(dobTextBox.getText());
+						employee.setTitle(jobTitleTextBox.getText());
+						
+						// update database and check for success
+						boolean success = frame.dao.updateEmployee(employee, employee.getId());
+						// TODO Consider logging errors in a log file. 
+						if (!success) {
+							JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				});
 				
 				
 				// menu setup
