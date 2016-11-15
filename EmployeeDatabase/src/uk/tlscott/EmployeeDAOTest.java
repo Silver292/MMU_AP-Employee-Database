@@ -16,11 +16,11 @@ public class EmployeeDAOTest {
 	
 	@Before
 	public void setUp() throws Exception{
-		// initialize your database connection here
+		// Initialise your database connection here
 		Class.forName("org.sqlite.JDBC");
 		databaseTester = new JdbcDatabaseTester("org.sqlite.JDBC", "jdbc:sqlite:empdb.sqlite");
 
-		// initialize your dataset here
+		// Initialise your data set here
 		IDataSet dataSet = new FlatXmlDataSetBuilder().build(new FileInputStream("testdb.xml"));
 		// ...
 
@@ -34,7 +34,7 @@ public class EmployeeDAOTest {
     @Test
 	public void selectEmployeeByNameMatchesName() throws Exception {
 		Employee emp = db.selectEmployeeByName("Fred Bloggs");
-		assertNotNull("vo shouldn't be null", emp);
+		assertNotNull("Employee shouldn't be null", emp);
 		assertEquals("Fred Bloggs", emp.getName());
 	}
 
