@@ -53,16 +53,17 @@ public class ControllerGUI {
     
     static JTextField nameTextBox      = new JTextField(16);
     static JTextField genderTextBox    = new JTextField(16);
-    static JTextField dobTextBox       = new JTextField(16);
     static JTextField salaryTextBox    = new JTextField(16);
     static JTextField ninTextBox       = new JTextField(16);
     static JTextField emailTextBox     = new JTextField(16);
-    static JTextField startDateTextBox = new JTextField(16);
     static JTextField jobTitleTextBox  = new JTextField(16);
     static ButtonGroup genderGroup     = new ButtonGroup();
     
     static JRadioButton maleRadio   = new JRadioButton("Male");
     static JRadioButton femaleRadio = new JRadioButton("Female");
+    
+	static DatePicker dobDate   = new DatePicker();
+	static DatePicker startDate = new DatePicker();
     
 	public static void main(String[] args) {
 
@@ -108,16 +109,15 @@ public class ControllerGUI {
 						employee.setGender(gender);
 						
 						employee.setName(nameTextBox.getText());
-						employee.setDob(dobTextBox.getText());
+						employee.setDob(dobDate.getDate());
 						employee.setSalary(salaryTextBox.getText());
 						employee.setNatInscNo(ninTextBox.getText());
 						employee.setEmail(emailTextBox.getText());
-						employee.setStartDate(dobTextBox.getText());
+						employee.setStartDate(startDate.getDate());
 						employee.setTitle(jobTitleTextBox.getText());
 						
 						// update database and check for success
 						boolean success = frame.dao.updateEmployee(employee, employee.getId());
-						// TODO Consider logging errors in a log file. 
 						if (!success) {
 							JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 						}
@@ -178,7 +178,8 @@ public class ControllerGUI {
 		Font boldFont = new Font("DejaVu Sans", Font.BOLD, 12);
 		Font titleFont = new Font("DejaVu Sans", Font.BOLD|Font.ITALIC, 16);
 		
-		JComponent[] textBoxes = {genderTextBox, dobTextBox, salaryTextBox, ninTextBox, emailTextBox, startDateTextBox, jobTitleTextBox};
+		//TODO: update if we add comboboxes, dobTextBox and StartDateTextBox
+		JComponent[] textBoxes = {genderTextBox, dobDate, salaryTextBox, ninTextBox, emailTextBox, startDate, jobTitleTextBox};
 		
 		JComponent[] labels = {enterButton, clearButton, backButton, forwardButton, nameLabel, 
 				genderLabel, dobLabel, salaryLabel, ninLabel, emailLabel, startDateLabel, jobTitleLabel, 
@@ -208,15 +209,16 @@ public class ControllerGUI {
 		if (emp.getGender() == 'M') maleRadio.setSelected(true);
 		else femaleRadio.setSelected(true);
 		
-		dobTextBox.setText(emp.getDob());
+		dobDate.setDate(emp.getDob());
 		salaryTextBox.setText(emp.getSalary());
 		ninTextBox.setText(emp.getNatInscNo());
 		emailTextBox.setText(emp.getEmail());
-		startDateTextBox.setText(emp.getStartDate());
+		startDate.setDate(emp.getStartDate());
 		jobTitleTextBox.setText(emp.getTitle());
 		empIdLabel.setText(emp.getId());
 	}
 	
+	//TODO move this to a class
 	/**
 	 * Lays out the frame using {@link GroupLayout}.
 	 * 
@@ -256,11 +258,11 @@ public class ControllerGUI {
 										.addComponent(femaleRadio)    
 										)
 								)
-						.addComponent(dobTextBox)      
+						.addComponent(dobDate)      
 						.addComponent(salaryTextBox)   
 						.addComponent(ninTextBox)      
 						.addComponent(emailTextBox)    
-						.addComponent(startDateTextBox)
+						.addComponent(startDate)
 						.addComponent(jobTitleTextBox) 
 						.addComponent(clearButton)
 						)
@@ -305,7 +307,7 @@ public class ControllerGUI {
 										)
 								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 										.addComponent(dobLabel)
-										.addComponent(dobTextBox)
+										.addComponent(dobDate)
 										)
 								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 										.addComponent(salaryLabel)
@@ -321,7 +323,7 @@ public class ControllerGUI {
 										)                        
 								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 										.addComponent(startDateLabel)
-										.addComponent(startDateTextBox)
+										.addComponent(startDate)
 										)                        
 								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 										.addComponent(jobTitleLabel)
@@ -349,6 +351,7 @@ public class ControllerGUI {
 				);
 	}
 	
+	//TODO move this to a class
 	/**
 	 * Lays out the frame using {@link GridBagLayout}.
 	 * 
@@ -363,8 +366,8 @@ public class ControllerGUI {
 		JComponent[] columnOne = {nameLabel, genderLabel, dobLabel, salaryLabel, 
 				ninLabel, emailLabel, startDateLabel, jobTitleLabel};
 		
-		JComponent[] columnTwo = {dobTextBox, salaryTextBox, ninTextBox, emailTextBox, 
-				startDateTextBox, jobTitleTextBox};
+		JComponent[] columnTwo = {salaryTextBox, ninTextBox, emailTextBox};
+				//,				startDate, jobTitleTextBox};
 		
 		
 		// Add title
@@ -402,7 +405,14 @@ public class ControllerGUI {
 		
 		c.anchor = GridBagConstraints.LINE_END;
 		mainPanel.add(femaleRadio, c); 
+
+		c.gridy++;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.ipady = 0;
+		mainPanel.add(dobDate, c);
 		
+		c.ipady = 10;
 		c.gridy++;
 		c.anchor = GridBagConstraints.LINE_START;
 		c.fill = GridBagConstraints.NONE;
@@ -412,6 +422,18 @@ public class ControllerGUI {
 			c.gridy++;
 		}
 		
+		c.ipady = 0;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		mainPanel.add(startDate, c);
+		
+		c.gridy++;
+		c.ipady = 10;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.fill = GridBagConstraints.NONE;
+		mainPanel.add(jobTitleTextBox, c);
+		
+		c.gridy++;
 		c.ipady = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.CENTER;
