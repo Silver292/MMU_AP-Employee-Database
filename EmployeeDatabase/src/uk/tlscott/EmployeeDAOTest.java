@@ -104,6 +104,18 @@ public class EmployeeDAOTest {
 		assertTrue("prepared statement should be closed", db.pstmt.isClosed());
 		assertTrue("connection should be closed", db.c.isClosed());
 	}
+	
+	@Test
+	public void updateEmployeeShouldChangeDetailsOnDatabase() {
+		Employee testEmp = db.selectEmployeeById(1);
+		assertEquals("salary should be ", "30000", testEmp.getSalary());
+		testEmp.setSalary("50000");
+		assertEquals("salary should change locally", "50000", testEmp.getSalary());
+		boolean updateResult = db.updateEmployee(testEmp, testEmp.getId());
+		assertTrue("update succeeds", updateResult);
+		testEmp = db.selectEmployeeById(1);
+		assertEquals("salary should be ", "50000", testEmp.getSalary());
+	}
 
 	private Employee getTestEmployee() {
 		Employee testEmp = new Employee();

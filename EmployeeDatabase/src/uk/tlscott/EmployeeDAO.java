@@ -145,7 +145,7 @@ public class EmployeeDAO {
 	}
 
 	public boolean insertEmployee(Employee emp) {
-		String sql = "INSERT INTO EMPLOYEES "
+		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email) "
 				+ "VALUES "
 				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"; 
@@ -172,7 +172,7 @@ public class EmployeeDAO {
 	}
 	
 	public boolean insertEmployeeAtID(Employee emp, String id) {
-		String sql = "INSERT INTO EMPLOYEES "
+		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, ID) "
 				+ "VALUES "
 				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -217,6 +217,44 @@ public class EmployeeDAO {
 			this.closeConnection();
 		}
 		
+	}
+	
+	public boolean updateEmployee(Employee emp, String id) {
+		String sql = "UPDATE employees SET "
+				+ "Name = ?, "
+                + "Gender = ?, "
+                + "DOB = ?, "
+                + "Address = ?, "
+                + "Postcode = ?, "
+                + "NIN = ?, "
+                + "JobTitle = ?, "
+                + "StartDate = ?, "
+                + "Salary = ?, "
+                + "Email = ? "
+                + "WHERE ID = ?;";
+		// convert string id to an integer for use with database
+		int idAsInt = Integer.parseInt(id);
+		try {
+			this.getConnection();
+			pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, emp.getName());
+            pstmt.setString(2, String.valueOf(emp.getGender()));
+            pstmt.setString(3, emp.getDob());
+            pstmt.setString(4, emp.getAddress());
+            pstmt.setString(5, emp.getPostcode());
+            pstmt.setString(6, emp.getNatInscNo());
+            pstmt.setString(7, emp.getTitle());
+            pstmt.setString(8, emp.getStartDate());
+            pstmt.setString(9, emp.getSalary());
+            pstmt.setString(10, emp.getEmail());
+            pstmt.setInt(11, idAsInt);
+			pstmt.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			return false;
+		} finally {
+			this.closeConnection();
+		}
 	}
 	
 }
