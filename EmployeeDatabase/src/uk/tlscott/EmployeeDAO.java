@@ -1,4 +1,5 @@
 package uk.tlscott;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -6,6 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class EmployeeDAO {
 	Connection c;
@@ -13,17 +18,44 @@ public class EmployeeDAO {
 	PreparedStatement pstmt;
 	ResultSet r;
 	
-	public EmployeeDAO() {}
+	// Logging variables
+	private static FileHandler fileHandler; 
+	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
+	private final String LOG_FILE = "./log/databaseConnection.log";
+	private final int LOG_FILE_SIZE_BYTES = 1000000;
+	private final int LOG_FILE_COUNT = 1;
+	
+	public EmployeeDAO() {
+		startLog();
+	}
 	
 	public Connection getConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:empdb.sqlite");
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error connecting to database", e);
 		}
 		
 		return c;
+	}
+
+	/**
+	 * Initialises log for database controller
+	 */
+	private void startLog() {
+		try {
+			fileHandler = new FileHandler(LOG_FILE, LOG_FILE_SIZE_BYTES, LOG_FILE_COUNT);
+		} catch (SecurityException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		fileHandler.setFormatter(new SimpleFormatter());
+		LOGGER.addHandler(fileHandler);
+		LOGGER.setLevel(Level.FINEST);
+		LOGGER.setUseParentHandlers(false);
 	}
 	
 	public void closeConnection() {
@@ -73,7 +105,7 @@ public class EmployeeDAO {
 			
 			this.closeConnection();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error selecting all employees", e);
 			return null;
 		}
 		
@@ -105,7 +137,7 @@ public class EmployeeDAO {
 				emp.setEmail(r.getString("Email"));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error selecting employee named: " + name, e);
 		} finally {
 			this.closeConnection();
 		}
@@ -137,7 +169,7 @@ public class EmployeeDAO {
 				emp.setEmail(r.getString("Email"));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error selecting employee id: " + id, e);
 		} finally {
 			this.closeConnection();
 		}
@@ -165,6 +197,7 @@ public class EmployeeDAO {
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error inserting employee", e);
 			return false;
 		} finally {
 			this.closeConnection();
@@ -195,6 +228,7 @@ public class EmployeeDAO {
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error inserting employee at id: " + id, e);
 			return false;
 		} finally {
 			this.closeConnection();
@@ -212,6 +246,7 @@ public class EmployeeDAO {
 			pstmt.execute();
 			return true;
 		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error deleting employee id: " + id, e);
 			return false;
 		} finally {
 			this.closeConnection();
@@ -251,6 +286,7 @@ public class EmployeeDAO {
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error updating employee record", e);
 			return false;
 		} finally {
 			this.closeConnection();
