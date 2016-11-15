@@ -21,7 +21,7 @@ public class EmployeeDAO {
 	// Logging variables
 	private static FileHandler fileHandler; 
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-	private final String LOG_FILE = "./log/databaseConnection.log";
+	private final String LOG_FILE = "./log/database.log";
 	private final int LOG_FILE_SIZE_BYTES = 1000000;
 	private final int LOG_FILE_COUNT = 1;
 	
