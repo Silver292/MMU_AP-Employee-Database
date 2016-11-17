@@ -54,9 +54,16 @@ public class MainForm extends JFrame{
 		fileMenu.add(exitItem);
 		
 		// Add display item to the Record menus
-		exitItem.addActionListener(new ActionListener() {
+		displayItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO: Select first employee in database and call setTextFields
+				Employee employee =dao.selectFirstEmployee();
+				
+				// show error if one has occured
+				if (employee == null) {
+					JOptionPane.showMessageDialog(null, "There was a getting the first employee", "Database Error", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				panel.setEmployee(employee);
 			}
 		});
 		

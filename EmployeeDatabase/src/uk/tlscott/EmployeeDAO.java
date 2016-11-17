@@ -293,4 +293,34 @@ public class EmployeeDAO {
 		}
 	}
 	
+	public Employee selectFirstEmployee() {
+		Employee emp = null;
+		String sql = "SELECT * FROM employees WHERE id = (SELECT MIN(ID) FROM employees);";
+		try {
+			this.getConnection();
+			s = c.createStatement();
+			r = s.executeQuery(sql);
+			if(r.next()) {
+				emp = new Employee();
+				emp.setId(Integer.toString(r.getInt("ID")));
+				emp.setName(r.getString("Name"));
+				emp.setGender(r.getString("Gender").charAt(0));
+				emp.setDob(r.getString("DOB"));
+				emp.setAddress(r.getString("Address"));
+				emp.setPostcode(r.getString("Postcode"));
+				emp.setNatInscNo(r.getString("NIN"));
+				emp.setTitle(r.getString("JobTitle"));
+				emp.setStartDate(r.getString("StartDate"));
+				emp.setSalary(r.getString("Salary"));
+				emp.setEmail(r.getString("Email"));
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error selecting first employee", e);
+			return emp;
+		} finally {
+			this.closeConnection();
+		}
+		
+		return emp;
+	}
 }
