@@ -106,7 +106,16 @@ public class EmployeeUpdatePanel extends JPanel{
 				employee.setStartDate(startDate.getDate());
 				employee.setTitle(jobTitleTextBox.getText());
 				
-				// update database and check for success
+				// check if employee has an id, if not create new employee
+				if(employee.getId() == null) {
+					boolean success = dao.insertEmployee(employee);
+					if (!success) {
+						JOptionPane.showMessageDialog(null, "There was a problem creating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
+					}
+					return;
+				}
+				
+				// update existing employee and check for success
 				boolean success = dao.updateEmployee(employee, employee.getId());
 				if (!success) {
 					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
@@ -115,8 +124,8 @@ public class EmployeeUpdatePanel extends JPanel{
 
 		});
 		
+		// Clear form
 		clearButton.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearFields();
@@ -211,6 +220,11 @@ public class EmployeeUpdatePanel extends JPanel{
 	 * @param emp employee to set details to.
 	 */
 	public void setEmployee(Employee emp) {
+		if(emp == null) {
+			clearFields();
+			return;
+		} 
+		
 		this.employee = emp;
 		setFields(emp);
 	}
