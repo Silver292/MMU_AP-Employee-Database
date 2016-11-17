@@ -97,8 +97,8 @@ public class EmployeeDAO {
 				emp.setPostcode(r.getString("Postcode"));
 				emp.setNatInscNo(r.getString("NIN"));
 				emp.setTitle(r.getString("JobTitle"));
-				emp.setStartDate(r.getString("Salary"));
-				emp.setSalary("StartDate");
+				emp.setStartDate(r.getString("StartDate"));
+				emp.setSalary(r.getString("Salary"));
 				emp.setEmail(r.getString("Email"));
 				employees.add(emp);
 			}
