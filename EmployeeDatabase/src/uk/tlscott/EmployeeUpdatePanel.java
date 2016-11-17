@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
@@ -82,9 +83,17 @@ public class EmployeeUpdatePanel extends JPanel{
 		setLayout(new GridBagLayout());
 		addComponents();
 		
+		/*
+		 * Action Listeners
+		 */
+		
 		// Update employee fields
 		enterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// check for empty fields and return if user cancels
+				if(!checkForEmptyFields())
+					return;
+					
 				// set gender
 				char gender =  maleRadio.isSelected() ? 'M' : 'F';
 				employee.setGender(gender);
@@ -103,12 +112,149 @@ public class EmployeeUpdatePanel extends JPanel{
 					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 		});
+		
+		clearButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clearFields();
+			}
+		});
+	}
+	
+	/**
+	 * Checks for empty fields in the form.
+	 * <br>
+	 * Creates JOptionPane to inform user that fields are empty.
+	 * <br>
+	 * If all fields are filled will return true.
+	 *<br> 
+	 * If there are any empty fields the user is informed using a {@link javax.swing.JOptionPane#showConfirmDialog confirm dialog}
+	 * if the user chooses to proceed with empty fields method will return true otherwise will return false. 
+	 * 
+	 * @return boolean true if all fields are filled or the user wants to proceed with empty fields, false if otherwise.
+	 */
+	private boolean checkForEmptyFields() {
+		ArrayList<String> emptyFieldList = new ArrayList<String>();
+		
+		// add empty fields to list
+		if(nameTextBox.getText().trim().isEmpty()) emptyFieldList.add("name");
+		if(salaryTextBox.getText().trim().isEmpty()) emptyFieldList.add("salary");
+		if(ninTextBox.getText().trim().isEmpty()) emptyFieldList.add("national insurance");
+		if(emailTextBox.getText().trim().isEmpty()) emptyFieldList.add("email");
+		if(jobTitleTextBox.getText().trim().isEmpty()) emptyFieldList.add("job title");
+		
+		// return if all are filled
+		if(emptyFieldList.isEmpty()) return true;
+		
+		// create error message
+		String emptyFields = "";
+
+		// add empty field to string comma seperated
+		int listSize = emptyFieldList.size();
+		for (int i = 0; i < listSize; i++) {
+			emptyFields += emptyFieldList.get(i);
+			
+			if (i < listSize - 1)
+				emptyFields += ", ";
+		}
+		
+		// create formatted error message
+		String emptyFieldsMessage = String.format("The %s %s %s empty. Continue?", 
+				listSize > 1 ? "fields" : "field", 
+				emptyFields, 
+				listSize > 1 ? "are" : "is");
+		
+		// show dialog and get user response
+		int userResponse = JOptionPane.showConfirmDialog(null, emptyFieldsMessage);
+		
+		// if user clicks yes
+		if(userResponse == JOptionPane.YES_OPTION) return true;
+		
+		// if user clicks 'No', 'Cancel' or closes the dialog 
+		return false;
 		
 	}
 
 	/**
+	 * Sets the fonts of text components.
+	 */
+	private void setFonts() {
+		Font baseFont = new Font("DejaVu Sans", Font.PLAIN, 12);
+		Font boldFont = new Font("DejaVu Sans", Font.BOLD, 12);
+		Font titleFont = new Font("DejaVu Sans", Font.BOLD|Font.ITALIC, 16);
+		
+		JComponent[] textBoxes = {genderTextBox, dobDate, salaryTextBox, ninTextBox, emailTextBox, startDate, jobTitleTextBox};
+		
+		JComponent[] labels = {enterButton, clearButton, backButton, forwardButton, nameLabel, 
+				genderLabel, dobLabel, salaryLabel, ninLabel, emailLabel, startDateLabel, jobTitleLabel, 
+				empIdTextLabel, empIdLabel, maleRadio, femaleRadio };
+		
+		
+		titleLabel.setFont(titleFont);
+		titleLabel.setForeground(new Color(24, 0, 204));
+		
+		for (int i = 0; i < textBoxes.length; i++) {
+			textBoxes[i].setFont(baseFont);
+		}
+		
+		for (int i = 0; i < labels.length; i++) {
+			labels[i].setFont(boldFont);
+		}
+	}
+
+	/**
+	 * Sets the fields to the employees details.
 	 * 
+	 * @param emp employee to set details to.
+	 */
+	public void setEmployee(Employee emp) {
+		this.employee = emp;
+		setFields(emp);
+	}
+
+	/**
+	 * Sets text fields in form using details from employee.
+	 * 
+	 * @param emp
+	 */
+	private void setFields(Employee emp) {
+		nameTextBox.setText(emp.getName());
+		// set gender radio button
+		if (emp.getGender() == 'M') maleRadio.setSelected(true);
+		else femaleRadio.setSelected(true);
+	
+		dobDate.setDate(emp.getDob());
+		salaryTextBox.setText(emp.getSalary());
+		ninTextBox.setText(emp.getNatInscNo());
+		emailTextBox.setText(emp.getEmail());
+		startDate.setDate(emp.getStartDate());
+		jobTitleTextBox.setText(emp.getTitle());
+		empIdLabel.setText(emp.getId());
+	}
+	
+	/**
+	 * Clears fields.
+	 */
+	private void clearFields() {
+		employee = new Employee();
+		String empty = "";
+		String emptyDate = "1-1-2016";
+		nameTextBox.setText(empty);
+		maleRadio.setSelected(true);
+		dobDate.setDate(emptyDate);
+		salaryTextBox.setText(empty);
+		ninTextBox.setText(empty);
+		emailTextBox.setText(empty);
+		startDate.setDate(emptyDate);
+		jobTitleTextBox.setText(empty);
+		empIdLabel.setText(empty);
+	}
+	
+	/**
+	 * Adds components to panel.
 	 */
 	private void addComponents() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -246,55 +392,4 @@ public class EmployeeUpdatePanel extends JPanel{
 		genderGroup.add(femaleRadio);
 	}
 	
-	/**
-	 * Sets text fields in form using details from employee.
-	 * 
-	 * @param emp
-	 */
-	private void setFields(Employee emp) {
-		nameTextBox.setText(emp.getName());
-		// set gender radio button
-		if (emp.getGender() == 'M') maleRadio.setSelected(true);
-		else femaleRadio.setSelected(true);
-
-		dobDate.setDate(emp.getDob());
-		salaryTextBox.setText(emp.getSalary());
-		ninTextBox.setText(emp.getNatInscNo());
-		emailTextBox.setText(emp.getEmail());
-		startDate.setDate(emp.getStartDate());
-		jobTitleTextBox.setText(emp.getTitle());
-		empIdLabel.setText(emp.getId());
-	}
-	
-	/**
-	 * Sets the fonts of text components.
-	 */
-	private void setFonts() {
-		Font baseFont = new Font("DejaVu Sans", Font.PLAIN, 12);
-		Font boldFont = new Font("DejaVu Sans", Font.BOLD, 12);
-		Font titleFont = new Font("DejaVu Sans", Font.BOLD|Font.ITALIC, 16);
-		
-		JComponent[] textBoxes = {genderTextBox, dobDate, salaryTextBox, ninTextBox, emailTextBox, startDate, jobTitleTextBox};
-		
-		JComponent[] labels = {enterButton, clearButton, backButton, forwardButton, nameLabel, 
-				genderLabel, dobLabel, salaryLabel, ninLabel, emailLabel, startDateLabel, jobTitleLabel, 
-				empIdTextLabel, empIdLabel, maleRadio, femaleRadio };
-		
-		
-		titleLabel.setFont(titleFont);
-		titleLabel.setForeground(new Color(24, 0, 204));
-		
-		for (int i = 0; i < textBoxes.length; i++) {
-			textBoxes[i].setFont(baseFont);
-		}
-		
-		for (int i = 0; i < labels.length; i++) {
-			labels[i].setFont(boldFont);
-		}
-	}
-
-	public void setEmployee(Employee emp) {
-		this.employee = emp;
-		setFields(emp);
-	}
 }
