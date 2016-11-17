@@ -292,6 +292,64 @@ public class EmployeeDAO {
 			this.closeConnection();
 		}
 	}
+
+	/**
+	 * Selects next employee in table based on employee id.
+	 * <br>
+	 * If at the end of the table will wrap around and return the first employee in the table.
+	 * @param id of the current employee.
+	 * @return Employee next employee in the table or first employee if there are no ids higher.
+	 */
+	public Employee getNextEmployee(String id) {
+		int idAsInt = Integer.parseInt(id);
+
+		// check if there are any records with an id higher than current.
+		String sql = "SELECT COUNT(*) AS count FROM employees WHERE ID > ?;";
+		
+		Employee emp = null;
+		try {
+			this.getConnection();		
+			pstmt = c.prepareStatement(sql);
+			pstmt.setInt(1, idAsInt);
+			r = pstmt.executeQuery();
+
+			// if count > 0 get next employee
+			int count = r.getInt("count");
+			if (count > 0 ) {
+				sql = "SELECT * FROM employees WHERE ID > ? ORDER BY ID LIMIT 1;";
+				pstmt = c.prepareStatement(sql);
+				pstmt.setInt(1, idAsInt);
+				r = pstmt.executeQuery();
+			} else {
+				// otherwise wrap around
+				sql = "SELECT * FROM employees WHERE id = (SELECT MIN(ID) FROM employees);";
+				s = c.createStatement();
+				r = s.executeQuery(sql);
+			}
+
+			// fill in employee information
+			if (r.next()) {
+				emp = new Employee();
+				emp.setId(Integer.toString(r.getInt("ID")));
+				emp.setName(r.getString("Name"));
+				emp.setGender(r.getString("Gender").charAt(0));
+				emp.setDob(r.getString("DOB"));
+				emp.setAddress(r.getString("Address"));
+				emp.setPostcode(r.getString("Postcode"));
+				emp.setNatInscNo(r.getString("NIN"));
+				emp.setTitle(r.getString("JobTitle"));
+				emp.setStartDate(r.getString("StartDate"));
+				emp.setSalary(r.getString("Salary"));
+				emp.setEmail(r.getString("Email"));
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error selecting employee id: " + id, e);
+		} finally {
+			this.closeConnection();
+		}
+		return emp;
+	}
+	
 	
 	public Employee selectFirstEmployee() {
 		Employee emp = null;
