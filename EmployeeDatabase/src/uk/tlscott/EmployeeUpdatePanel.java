@@ -153,6 +153,27 @@ public class EmployeeUpdatePanel extends JPanel{
 				setEmployee(employee);
 			}
 		});
+		
+		// Back button
+		backButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(employee.getId() == null) {
+					employee = dao.selectFirstEmployee();
+				} else {
+					// get next employee from the database
+					employee = dao.getPreviousEmployee(employee.getId());
+				}
+				
+				// show error if one has occured
+				if (employee == null) {
+					JOptionPane.showMessageDialog(null, "There was a getting the previous employee", "Database Error", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				// update fields
+				setEmployee(employee);
+			}
+		});
 	}
 	
 	/**
