@@ -20,6 +20,8 @@ public class MainForm extends JFrame{
 
 		setSize(600,400);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// centre frame on screen
+		setLocationRelativeTo(null);
 		
 		setUpMenu();
 
