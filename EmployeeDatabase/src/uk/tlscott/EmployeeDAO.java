@@ -1,4 +1,8 @@
 package uk.tlscott;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -112,6 +116,7 @@ public class EmployeeDAO {
 		return employees;
 	}
 
+	//TODO Read image from database
 	public Employee selectEmployeeByName(String name) {
 		String sqlStatement = "SELECT * FROM employees WHERE Name = ?";
 		Employee emp = null;
@@ -144,6 +149,7 @@ public class EmployeeDAO {
 		return emp;
 	}
 	
+	//TODO read image from database
 	public Employee selectEmployeeById(int id) {
 		String sql = "SELECT * FROM employees WHERE ID = ?";
 		Employee emp = null;
@@ -178,9 +184,9 @@ public class EmployeeDAO {
 
 	public boolean insertEmployee(Employee emp) {
 		String sql = "INSERT INTO employees "
-				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email) "
+				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
 				+ "VALUES "
-				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"; 
+				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"; 
 		try {
 			this.getConnection();
 			pstmt = c.prepareStatement(sql);
@@ -194,16 +200,18 @@ public class EmployeeDAO {
             pstmt.setString(8, emp.getStartDate());
             pstmt.setString(9, emp.getSalary());
             pstmt.setString(10, emp.getEmail());
+            pstmt.setBytes(11, readFile(emp.getImageFile()));
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error inserting employee", e);
-			return false;
 		} finally {
 			this.closeConnection();
 		}
+		return false;
 	}
 	
+	// TODO add image insertion
 	public boolean insertEmployeeAtID(Employee emp, String id) {
 		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, ID) "
@@ -254,6 +262,7 @@ public class EmployeeDAO {
 		
 	}
 	
+//	TODO DO we need to pass string id?
 	public boolean updateEmployee(Employee emp, String id) {
 		String sql = "UPDATE employees SET "
 				+ "Name = ?, "
@@ -265,7 +274,8 @@ public class EmployeeDAO {
                 + "JobTitle = ?, "
                 + "StartDate = ?, "
                 + "Salary = ?, "
-                + "Email = ? "
+                + "Email = ?, "
+                + "Image = ? "
                 + "WHERE ID = ?;";
 		// convert string id to an integer for use with database
 		int idAsInt = Integer.parseInt(id);
@@ -282,15 +292,16 @@ public class EmployeeDAO {
             pstmt.setString(8, emp.getStartDate());
             pstmt.setString(9, emp.getSalary());
             pstmt.setString(10, emp.getEmail());
-            pstmt.setInt(11, idAsInt);
+            pstmt.setBytes(11, readFile(emp.getImageFile()));
+            pstmt.setInt(12, idAsInt);
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error updating employee record", e);
-			return false;
 		} finally {
 			this.closeConnection();
 		}
+		return false;
 	}
 
 	/**
@@ -438,4 +449,27 @@ public class EmployeeDAO {
 		}
 		return emp;
 	}
+	
+	//TODO: Write our own
+	/**
+     * Read the file and returns the byte array
+     * @param file
+     * @return the bytes of the file
+     */
+    private byte[] readFile(File file) {
+        ByteArrayOutputStream bos = null;
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            bos = new ByteArrayOutputStream();
+            for (int len; (len = fis.read(buffer)) != -1;) {
+                bos.write(buffer, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.log(Level.WARNING, "Error reading image file", e);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error reading image file", e);
+        }
+        return bos != null ? bos.toByteArray() : null;
+    }
 }
