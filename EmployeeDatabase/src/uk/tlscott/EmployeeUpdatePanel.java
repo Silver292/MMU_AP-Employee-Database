@@ -73,16 +73,9 @@ public class EmployeeUpdatePanel extends JPanel{
 	private Employee employee;
 	private EmployeeDAO dao;
 	
-	private static FileHandler fileHandler; 
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-	private final String LOG_FILE = "./log/swing.log";
-	private final int LOG_FILE_SIZE_BYTES = 1000000;
-	private final int LOG_FILE_COUNT = 1;
-	
-	private ImageIcon DEFAULT_IMAGE;
 	
 	public EmployeeUpdatePanel(EmployeeDAO dao) {
-		startLog();
 		this.dao = dao;
 		
 		// set default image
@@ -510,24 +503,5 @@ public class EmployeeUpdatePanel extends JPanel{
 			JOptionPane.showMessageDialog(null, "Could not load image, invalid file type", "Image Error", JOptionPane.ERROR_MESSAGE);
 		}
 		
-	}
-	
-	//TODO: This is used in two classes - make static?
-	/**
-	 * Initialises log for java panel
-	 */
-	private void startLog() {
-		try {
-			fileHandler = new FileHandler(LOG_FILE, LOG_FILE_SIZE_BYTES, LOG_FILE_COUNT);
-		} catch (SecurityException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-		fileHandler.setFormatter(new SimpleFormatter());
-		LOGGER.addHandler(fileHandler);
-		LOGGER.setLevel(Level.FINEST);
-		LOGGER.setUseParentHandlers(false);
 	}
 }

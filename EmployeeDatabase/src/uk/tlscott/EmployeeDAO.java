@@ -23,15 +23,9 @@ public class EmployeeDAO {
 	ResultSet r;
 	
 	// Logging variables
-	private static FileHandler fileHandler; 
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-	private final String LOG_FILE = "./log/database.log";
-	private final int LOG_FILE_SIZE_BYTES = 1000000;
-	private final int LOG_FILE_COUNT = 1;
 	
-	public EmployeeDAO() {
-		startLog();
-	}
+	public EmployeeDAO() {}
 	
 	public Connection getConnection() {
 		try {
@@ -42,24 +36,6 @@ public class EmployeeDAO {
 		}
 		
 		return c;
-	}
-
-	/**
-	 * Initialises log for database controller
-	 */
-	private void startLog() {
-		try {
-			fileHandler = new FileHandler(LOG_FILE, LOG_FILE_SIZE_BYTES, LOG_FILE_COUNT);
-		} catch (SecurityException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-		fileHandler.setFormatter(new SimpleFormatter());
-		LOGGER.addHandler(fileHandler);
-		LOGGER.setLevel(Level.FINEST);
-		LOGGER.setUseParentHandlers(false);
 	}
 	
 	public void closeConnection() {
