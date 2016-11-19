@@ -35,8 +35,7 @@ import javax.swing.JTextField;
 public class EmployeeUpdatePanel extends JPanel{
 	private static final long serialVersionUID = -5570407357068482978L;
 	
-	private Image  image;
-    private JLabel imageLabel = new JLabel();
+    private ImagePane imageLabel = new ImagePane();
     
     private JButton enterButton   = new JButton("Enter");
     private JButton clearButton   = new JButton("Clear");
@@ -77,13 +76,6 @@ public class EmployeeUpdatePanel extends JPanel{
 	
 	public EmployeeUpdatePanel(EmployeeDAO dao) {
 		this.dao = dao;
-		
-		// set default image
-		try {
-			DEFAULT_IMAGE = new ImageIcon(ImageIO.read(new File("assets/default.png")));
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Default image failed to load", e);
-		}
 		
 		setFonts();
 		
@@ -300,18 +292,10 @@ public class EmployeeUpdatePanel extends JPanel{
 		jobTitleTextBox.setText(employee.getTitle());
 		empIdLabel.setText(employee.getId());
 		
-		//TODO: Move image into its own pane
 		if (employee.hasImage()) {
-			try {
-				// get image from file
-				image = ImageIO.read(employee.getImageFile());
-				image = image.getScaledInstance(250, 250, Image.SCALE_DEFAULT);
-				imageLabel.setIcon(new ImageIcon(image));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			imageLabel.setImage(employee.getImageFile());
 		} else {
-			imageLabel.setIcon(DEFAULT_IMAGE);
+			imageLabel.setDefaultImage();
 		}
 		
 	}
@@ -332,9 +316,7 @@ public class EmployeeUpdatePanel extends JPanel{
 		startDate.setDate(emptyDate);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
-		
-		// TODO: Image code
-		imageLabel.setIcon(DEFAULT_IMAGE);
+		imageLabel.setDefaultImage();
 	}
 	
 	/**
@@ -476,17 +458,16 @@ public class EmployeeUpdatePanel extends JPanel{
 		genderGroup.add(femaleRadio);
 	}
 
-	//TODO: image code
 	/**
 	 * Sets employee image, shows image in pane.
-	 * @param selectedFile image file to display
+	 * @param file image file to display
 	 */
-	public void setImage(File selectedFile) {
+	public void setImage(File file) {
 		String fileType = "Unknown";
 		
 		// get file extension
 		try {
-			fileType = Files.probeContentType(selectedFile.toPath());
+			fileType = Files.probeContentType(file.toPath());
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Error identifying file extension", e);
 		}
@@ -494,7 +475,7 @@ public class EmployeeUpdatePanel extends JPanel{
 		// check for valid type
 		boolean isValidFileType = fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/gif");
 		if (isValidFileType) {
-			employee.setImage(selectedFile);
+			employee.setImage(file);
 
 			// update pane
 			setFields();
