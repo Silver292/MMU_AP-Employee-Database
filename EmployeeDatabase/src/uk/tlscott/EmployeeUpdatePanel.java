@@ -9,12 +9,20 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -65,17 +73,23 @@ public class EmployeeUpdatePanel extends JPanel{
 	private Employee employee;
 	private EmployeeDAO dao;
 	
+	private static FileHandler fileHandler; 
+	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
+	private final String LOG_FILE = "./log/swing.log";
+	private final int LOG_FILE_SIZE_BYTES = 1000000;
+	private final int LOG_FILE_COUNT = 1;
+	
+	private ImageIcon DEFAULT_IMAGE;
+	
 	public EmployeeUpdatePanel(EmployeeDAO dao) {
-
+		startLog();
 		this.dao = dao;
 		
-		//TODO: remove this and add images to database
+		// set default image
 		try {
-			image = ImageIO.read(new File("assets/default.png"));
-			image = image.getScaledInstance(250, 250, Image.SCALE_DEFAULT);
-			imageLabel = new JLabel(new ImageIcon(image));
+			DEFAULT_IMAGE = new ImageIcon(ImageIO.read(new File("assets/default.png")));
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Default image failed to load", e);
 		}
 		
 		setFonts();
@@ -198,6 +212,8 @@ public class EmployeeUpdatePanel extends JPanel{
 		if(emailTextBox.getText().trim().isEmpty()) emptyFieldList.add("email");
 		if(jobTitleTextBox.getText().trim().isEmpty()) emptyFieldList.add("job title");
 		
+		//TODO: Should we warn if there is no image?
+		
 		// return if all are filled
 		if(emptyFieldList.isEmpty()) return true;
 		
@@ -269,7 +285,7 @@ public class EmployeeUpdatePanel extends JPanel{
 		} 
 		
 		this.employee = emp;
-		setFields(emp);
+		setFields();
 	}
 
 	/**
@@ -277,19 +293,34 @@ public class EmployeeUpdatePanel extends JPanel{
 	 * 
 	 * @param emp
 	 */
-	private void setFields(Employee emp) {
-		nameTextBox.setText(emp.getName());
+	private void setFields() {
+		nameTextBox.setText(employee.getName());
 		// set gender radio button
-		if (emp.getGender() == 'M') maleRadio.setSelected(true);
+		if (employee.getGender() == 'M') maleRadio.setSelected(true);
 		else femaleRadio.setSelected(true);
 	
-		dobDate.setDate(emp.getDob());
-		salaryTextBox.setText(emp.getSalary());
-		ninTextBox.setText(emp.getNatInscNo());
-		emailTextBox.setText(emp.getEmail());
-		startDate.setDate(emp.getStartDate());
-		jobTitleTextBox.setText(emp.getTitle());
-		empIdLabel.setText(emp.getId());
+		dobDate.setDate(employee.getDob());
+		salaryTextBox.setText(employee.getSalary());
+		ninTextBox.setText(employee.getNatInscNo());
+		emailTextBox.setText(employee.getEmail());
+		startDate.setDate(employee.getStartDate());
+		jobTitleTextBox.setText(employee.getTitle());
+		empIdLabel.setText(employee.getId());
+		
+		//TODO: Move image into its own pane
+		if (employee.hasImage()) {
+			try {
+				// get image from file
+				image = ImageIO.read(employee.getImageFile());
+				image = image.getScaledInstance(250, 250, Image.SCALE_DEFAULT);
+				imageLabel.setIcon(new ImageIcon(image));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			imageLabel.setIcon(DEFAULT_IMAGE);
+		}
+		
 	}
 	
 	/**
@@ -308,6 +339,9 @@ public class EmployeeUpdatePanel extends JPanel{
 		startDate.setDate(emptyDate);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
+		
+		// TODO: Image code
+		imageLabel.setIcon(DEFAULT_IMAGE);
 	}
 	
 	/**
@@ -448,5 +482,52 @@ public class EmployeeUpdatePanel extends JPanel{
 		genderGroup.add(maleRadio);
 		genderGroup.add(femaleRadio);
 	}
+
+	//TODO: image code
+	/**
+	 * Sets employee image, shows image in pane.
+	 * @param selectedFile image file to display
+	 */
+	public void setImage(File selectedFile) {
+		String fileType = "Unknown";
+		
+		// get file extension
+		try {
+			fileType = Files.probeContentType(selectedFile.toPath());
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Error identifying file extension", e);
+		}
+		
+		// check for valid type
+		boolean isValidFileType = fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/gif");
+		if (isValidFileType) {
+			employee.setImage(selectedFile);
+
+			// update pane
+			setFields();
+		} else {
+			// show error message
+			JOptionPane.showMessageDialog(null, "Could not load image, invalid file type", "Image Error", JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
 	
+	//TODO: This is used in two classes - make static?
+	/**
+	 * Initialises log for java panel
+	 */
+	private void startLog() {
+		try {
+			fileHandler = new FileHandler(LOG_FILE, LOG_FILE_SIZE_BYTES, LOG_FILE_COUNT);
+		} catch (SecurityException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		fileHandler.setFormatter(new SimpleFormatter());
+		LOGGER.addHandler(fileHandler);
+		LOGGER.setLevel(Level.FINEST);
+		LOGGER.setUseParentHandlers(false);
+	}
 }
