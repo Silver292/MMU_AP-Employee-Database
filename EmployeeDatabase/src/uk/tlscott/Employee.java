@@ -1,4 +1,7 @@
 package uk.tlscott;
+
+import java.io.File;
+
 public class Employee extends Person {
 
 	private String id;
@@ -6,6 +9,7 @@ public class Employee extends Person {
 	private String startDate;
 	private String title;
 	private String email;
+	private File imageFile;
 
 	public Employee() {
 		super();
@@ -44,6 +48,10 @@ public class Employee extends Person {
 	 */
 	public String getEmail() {
 		return email;
+	}
+
+	public File getImageFile() {
+		return this.imageFile;
 	}
 
 	/**
@@ -85,6 +93,15 @@ public class Employee extends Person {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public void setImage(File file) {
+		this.imageFile = file;
+	}
+	
+	public boolean hasImage() {
+		return this.imageFile != null;
+	}
+	
 
 	/*
 	 * (non-Javadoc)

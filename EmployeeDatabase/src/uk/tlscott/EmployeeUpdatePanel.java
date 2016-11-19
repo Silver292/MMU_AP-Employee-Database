@@ -9,12 +9,20 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -27,8 +35,7 @@ import javax.swing.JTextField;
 public class EmployeeUpdatePanel extends JPanel{
 	private static final long serialVersionUID = -5570407357068482978L;
 	
-	private Image  image;
-    private JLabel imageLabel = new JLabel();
+    private ImagePane imageLabel = new ImagePane();
     
     private JButton enterButton   = new JButton("Enter");
     private JButton clearButton   = new JButton("Clear");
@@ -65,18 +72,10 @@ public class EmployeeUpdatePanel extends JPanel{
 	private Employee employee;
 	private EmployeeDAO dao;
 	
+	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
+	
 	public EmployeeUpdatePanel(EmployeeDAO dao) {
-
 		this.dao = dao;
-		
-		//TODO: remove this and add images to database
-		try {
-			image = ImageIO.read(new File("assets/default.png"));
-			image = image.getScaledInstance(250, 250, Image.SCALE_DEFAULT);
-			imageLabel = new JLabel(new ImageIcon(image));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		setFonts();
 		
@@ -116,7 +115,7 @@ public class EmployeeUpdatePanel extends JPanel{
 				}
 				
 				// update existing employee and check for success
-				boolean success = dao.updateEmployee(employee, employee.getId());
+				boolean success = dao.updateEmployee(employee);
 				if (!success) {
 					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 				}
@@ -198,6 +197,8 @@ public class EmployeeUpdatePanel extends JPanel{
 		if(emailTextBox.getText().trim().isEmpty()) emptyFieldList.add("email");
 		if(jobTitleTextBox.getText().trim().isEmpty()) emptyFieldList.add("job title");
 		
+		//TODO: Should we warn if there is no image?
+		
 		// return if all are filled
 		if(emptyFieldList.isEmpty()) return true;
 		
@@ -269,7 +270,7 @@ public class EmployeeUpdatePanel extends JPanel{
 		} 
 		
 		this.employee = emp;
-		setFields(emp);
+		setFields();
 	}
 
 	/**
@@ -277,19 +278,26 @@ public class EmployeeUpdatePanel extends JPanel{
 	 * 
 	 * @param emp
 	 */
-	private void setFields(Employee emp) {
-		nameTextBox.setText(emp.getName());
+	private void setFields() {
+		nameTextBox.setText(employee.getName());
 		// set gender radio button
-		if (emp.getGender() == 'M') maleRadio.setSelected(true);
+		if (employee.getGender() == 'M') maleRadio.setSelected(true);
 		else femaleRadio.setSelected(true);
 	
-		dobDate.setDate(emp.getDob());
-		salaryTextBox.setText(emp.getSalary());
-		ninTextBox.setText(emp.getNatInscNo());
-		emailTextBox.setText(emp.getEmail());
-		startDate.setDate(emp.getStartDate());
-		jobTitleTextBox.setText(emp.getTitle());
-		empIdLabel.setText(emp.getId());
+		dobDate.setDate(employee.getDob());
+		salaryTextBox.setText(employee.getSalary());
+		ninTextBox.setText(employee.getNatInscNo());
+		emailTextBox.setText(employee.getEmail());
+		startDate.setDate(employee.getStartDate());
+		jobTitleTextBox.setText(employee.getTitle());
+		empIdLabel.setText(employee.getId());
+		
+		if (employee.hasImage()) {
+			imageLabel.setImage(employee.getImageFile());
+		} else {
+			imageLabel.setDefaultImage();
+		}
+		
 	}
 	
 	/**
@@ -308,6 +316,7 @@ public class EmployeeUpdatePanel extends JPanel{
 		startDate.setDate(emptyDate);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
+		imageLabel.setDefaultImage();
 	}
 	
 	/**
@@ -448,5 +457,32 @@ public class EmployeeUpdatePanel extends JPanel{
 		genderGroup.add(maleRadio);
 		genderGroup.add(femaleRadio);
 	}
-	
+
+	/**
+	 * Sets employee image, shows image in pane.
+	 * @param file image file to display
+	 */
+	public void setImage(File file) {
+		String fileType = "Unknown";
+		
+		// get file extension
+		try {
+			fileType = Files.probeContentType(file.toPath());
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Error identifying file extension", e);
+		}
+		
+		// check for valid type
+		boolean isValidFileType = fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/gif");
+		if (isValidFileType) {
+			employee.setImage(file);
+
+			// update pane
+			setFields();
+		} else {
+			// show error message
+			JOptionPane.showMessageDialog(null, "Could not load image, invalid file type", "Image Error", JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
 }

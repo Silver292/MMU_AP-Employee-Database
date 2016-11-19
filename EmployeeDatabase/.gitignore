@@ -64,3 +64,8 @@ hs_err_pid*
 # log files
 /log/
 /log/*.log
+
+# temp images
+/assets/
+# not default image
+!default.png

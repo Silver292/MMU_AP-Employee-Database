@@ -60,15 +60,16 @@ public class Controller {
 			System.out.println("FAILURE: Employee " + emp.getName() + " at ID = " + id + " deletion failed.");
 		}
 		
-		id = "10";
-		
-		// Test insert employeeAtId
-		if (db.insertEmployeeAtID(emp, id)) {
-			System.out.println("SUCCESS: Employee " + emp.getName() + " inserted at ID=" + id);
-		} else {
-			System.out.println("FAILURE: Employee " + emp.getName() + " insertion failed at ID=" +id);
-		}
-		
+		//TODO Find out if insert at id is just update
+//		id = "10";
+//		
+//		// Test insert employeeAtId
+//		if (db.insertEmployeeAtID(emp, id)) {
+//			System.out.println("SUCCESS: Employee " + emp.getName() + " inserted at ID=" + id);
+//		} else {
+//			System.out.println("FAILURE: Employee " + emp.getName() + " insertion failed at ID=" +id);
+//		}
+//		
 
 		
 		db.closeConnection();
