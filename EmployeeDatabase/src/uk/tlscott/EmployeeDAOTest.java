@@ -113,7 +113,7 @@ public class EmployeeDAOTest {
 		assertEquals("salary should be ", "30000", testEmp.getSalary());
 		testEmp.setSalary("50000");
 		assertEquals("salary should change locally", "50000", testEmp.getSalary());
-		boolean updateResult = db.updateEmployee(testEmp, testEmp.getId());
+		boolean updateResult = db.updateEmployee(testEmp);
 		assertTrue("update succeeds", updateResult);
 		testEmp = db.selectEmployeeById(1);
 		assertEquals("salary should be ", "50000", testEmp.getSalary());

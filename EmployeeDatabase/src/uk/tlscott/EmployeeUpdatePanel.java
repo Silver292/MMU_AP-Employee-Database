@@ -115,7 +115,7 @@ public class EmployeeUpdatePanel extends JPanel{
 				}
 				
 				// update existing employee and check for success
-				boolean success = dao.updateEmployee(employee, employee.getId());
+				boolean success = dao.updateEmployee(employee);
 				if (!success) {
 					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 				}

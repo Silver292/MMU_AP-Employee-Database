@@ -82,8 +82,7 @@ public class EmployeeDAO {
 		return false;
 	}
 
-	//	TODO DO we need to pass string id?
-	public boolean updateEmployee(Employee emp, String id) {
+	public boolean updateEmployee(Employee emp) {
 		String sql = "UPDATE employees SET "
 				+ "Name = ?, "
 	            + "Gender = ?, "
@@ -98,7 +97,7 @@ public class EmployeeDAO {
 	            + "Image = ? "
 	            + "WHERE ID = ?;";
 		// convert string id to an integer for use with database
-		int idAsInt = Integer.parseInt(id);
+		int idAsInt = Integer.parseInt(emp.getId());
 		try {
 			this.getConnection();
 			pstmt = c.prepareStatement(sql);
@@ -133,7 +132,6 @@ public class EmployeeDAO {
 		return employees;
 	}
 
-	//TODO Read image from database
 	public Employee selectEmployeeByName(String name) {
 		String sqlStatement = "SELECT * FROM employees WHERE Name = ?";
 		Employee emp = null;
@@ -155,7 +153,6 @@ public class EmployeeDAO {
 		return emp;
 	}
 	
-	//TODO read image from database
 	public Employee selectEmployeeById(int id) {
 		String sql = "SELECT * FROM employees WHERE ID = ?";
 		Employee emp = null;
@@ -372,13 +369,14 @@ public class EmployeeDAO {
 		return null;
 	}
 
-	//TODO: Write our own
 	/**
      * Read the file and returns the byte array
      * @param file
      * @return the bytes of the file
      */
     private byte[] readFile(File file) {
+    	if (file == null) return null;
+    	
         ByteArrayOutputStream bos = null;
         try {
             FileInputStream fis = new FileInputStream(file);
