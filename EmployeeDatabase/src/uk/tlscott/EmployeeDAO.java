@@ -261,48 +261,6 @@ public class EmployeeDAO {
 		}
 		
 	}
-	
-//	TODO DO we need to pass string id?
-	public boolean updateEmployee(Employee emp, String id) {
-		String sql = "UPDATE employees SET "
-				+ "Name = ?, "
-                + "Gender = ?, "
-                + "DOB = ?, "
-                + "Address = ?, "
-                + "Postcode = ?, "
-                + "NIN = ?, "
-                + "JobTitle = ?, "
-                + "StartDate = ?, "
-                + "Salary = ?, "
-                + "Email = ?, "
-                + "Image = ? "
-                + "WHERE ID = ?;";
-		// convert string id to an integer for use with database
-		int idAsInt = Integer.parseInt(id);
-		try {
-			this.getConnection();
-			pstmt = c.prepareStatement(sql);
-            pstmt.setString(1, emp.getName());
-            pstmt.setString(2, String.valueOf(emp.getGender()));
-            pstmt.setString(3, emp.getDob());
-            pstmt.setString(4, emp.getAddress());
-            pstmt.setString(5, emp.getPostcode());
-            pstmt.setString(6, emp.getNatInscNo());
-            pstmt.setString(7, emp.getTitle());
-            pstmt.setString(8, emp.getStartDate());
-            pstmt.setString(9, emp.getSalary());
-            pstmt.setString(10, emp.getEmail());
-            pstmt.setBytes(11, readFile(emp.getImageFile()));
-            pstmt.setInt(12, idAsInt);
-			pstmt.executeUpdate();
-			return true;
-		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, "Error updating employee record", e);
-		} finally {
-			this.closeConnection();
-		}
-		return false;
-	}
 
 	/**
 	 * Selects next employee in table based on employee id.
