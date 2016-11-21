@@ -392,4 +392,75 @@ public class EmployeeDAO {
         }
         return bos != null ? bos.toByteArray() : null;
     }
+
+    public ArrayList<Employee> searchByID(String id) {
+    	ArrayList<Employee> employees = new ArrayList<Employee>();
+    	id = String.format("%%%s%%", id);
+    	String sql = "SELECT * FROM employees WHERE ID LIKE ?;";
+    	try {
+    		this.getConnection();       
+    		pstmt = c.prepareStatement(sql);
+    		pstmt.setString(1, id);
+    		r = pstmt.executeQuery();
+
+    		while (r.next()) {
+    			Employee emp = null;
+    			emp = setEmployeeFields();
+    			employees.add(emp);
+    		}
+    	} catch (SQLException e) {
+    		LOGGER.log(Level.WARNING, "Error searching for employee id: " + id, e);
+    	} finally {
+    		this.closeConnection();
+    	}
+    	return employees;
+    }
+
+    public ArrayList<Employee> searchByName(String name) {
+    	ArrayList<Employee> employees = new ArrayList<Employee>();
+    	name = String.format("%%%s%%", name);
+    	String sql = "SELECT * FROM employees WHERE Name LIKE ?;";
+    	try {
+    		this.getConnection();       
+    		pstmt = c.prepareStatement(sql);
+    		pstmt.setString(1, name);
+    		r = pstmt.executeQuery();
+
+    		while (r.next()) {
+    			Employee emp = null;
+    			emp = setEmployeeFields();
+    			employees.add(emp);
+    		}
+    	} catch (SQLException e) {
+    		LOGGER.log(Level.WARNING, "Error searching for employee name: " + name, e);
+    	} finally {
+    		this.closeConnection();
+    	}
+    	return employees;
+    }
+
+    public ArrayList<Employee> searchByNameAndID(String name, String id) {
+    	ArrayList<Employee> employees = new ArrayList<Employee>();
+    	name = String.format("%%%s%%", name);
+    	id = String.format("%%%s%%", id);
+    	String sql = "SELECT * FROM employees WHERE Name LIKE ? OR ID LIKE ?;";
+    	try {
+    		this.getConnection();       
+    		pstmt = c.prepareStatement(sql);
+    		pstmt.setString(1, name);
+    		pstmt.setString(2, id);
+    		r = pstmt.executeQuery();
+
+    		while (r.next()) {
+    			Employee emp = null;
+    			emp = setEmployeeFields();
+    			employees.add(emp);
+    		}
+    	} catch (SQLException e) {
+    		LOGGER.log(Level.WARNING, "Error searching for employee name: " + name + " id:" + id, e);
+    	} finally {
+    		this.closeConnection();
+    	}
+    	return employees;
+    }
 }
