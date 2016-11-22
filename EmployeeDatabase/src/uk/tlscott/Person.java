@@ -1,5 +1,8 @@
 package uk.tlscott;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Person {
 	private String name;
 	private char gender;
@@ -71,8 +74,16 @@ public class Person {
 	/**
 	 * @param natInscNo the natInscNo to set
 	 */
-	public void setNatInscNo(String natInscNo) {
-		this.natInscNo = natInscNo;
+	public void setNatInscNo(String natInscNo) throws IllegalArgumentException{
+		// Validate national insurance number
+		natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
+		Pattern NINPattern = Pattern.compile("^(?!BG|GB|NK|KN|TN|NT|ZZ)[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\\d{6}[A-D]$");
+		Matcher match = NINPattern.matcher(natInscNo);
+		if (match.matches()) {
+			this.natInscNo = natInscNo;
+			return;
+		}
+		throw new IllegalArgumentException("Invalid national insurance number");
 	}
 
 	/**
