@@ -75,6 +75,12 @@ public class Person {
 	 * @param natInscNo the natInscNo to set
 	 */
 	public void setNatInscNo(String natInscNo) throws IllegalArgumentException{
+		// Allow field to be null or empty string
+		if (natInscNo == null || natInscNo.equals("")) {
+			this.natInscNo = natInscNo;
+			return;
+		}
+		
 		// Validate national insurance number
 		natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
 		Pattern NINPattern = Pattern.compile("^(?!BG|GB|NK|KN|TN|NT|ZZ)[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\\d{6}[A-D]$");
