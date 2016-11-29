@@ -2,6 +2,10 @@ package uk.tlscott.tests;
 
 import static org.junit.Assert.*;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -67,6 +71,28 @@ public class EmployeeTest {
 	public void nationalInsuranceNumber_CanBeSetToEmptyString() throws Exception {
 		emp.setNatInscNo("");
 		assertEquals("", emp.getNatInscNo());
+	}
+	
+	@Ignore
+	@Test(expected = IllegalArgumentException.class)
+	public void employeeMustBeOverSixteen() throws Exception {
+		SimpleDateFormat df = new SimpleDateFormat("d-M-y");
+		LocalDate date = LocalDate.now();
+		emp.setDob(date);
+		fail("employee must be over sixteen");
+	}
+	
+	@Test
+	public void canSetEmployeeDOB() throws Exception {
+		String date = "23-11-2016";
+		emp.setDob(date);
+		assertEquals(date, emp.getDob());
+	}
+	
+	@Test
+	public void DOBCanBe_Null() throws Exception {
+		emp.setDob(null);
+		assertEquals(null, emp.getDob());
 	}
 	
 	@Ignore
