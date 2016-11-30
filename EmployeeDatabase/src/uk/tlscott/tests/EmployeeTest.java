@@ -4,16 +4,21 @@ import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.tlscott.Employee;
+import uk.tlscott.StartWorkDateException;
+import uk.tlscott.UnderMinimumAgeException;
 
 public class EmployeeTest {
 
 	private Employee emp = new Employee();
+	
+	// NIN
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void incorrectNINThrowsError() {
@@ -73,33 +78,33 @@ public class EmployeeTest {
 		assertEquals("", emp.getNatInscNo());
 	}
 	
-	@Ignore
-	@Test(expected = IllegalArgumentException.class)
-	public void employeeMustBeOverSixteen() throws Exception {
-		SimpleDateFormat df = new SimpleDateFormat("d-M-y");
-		LocalDate date = LocalDate.now();
-		emp.setDob(date);
-		fail("employee must be over sixteen");
-	}
+	
+	// DOB
 	
 	@Test
 	public void canSetEmployeeDOB() throws Exception {
-		String date = "23-11-2016";
-		emp.setDob(date);
+		String date = "1-01-1964";
+		emp.setEmployeeDob(date);
 		assertEquals(date, emp.getDob());
 	}
 	
 	@Test
 	public void DOBCanBe_Null() throws Exception {
-		emp.setDob(null);
+		emp.setEmployeeDob(null);
 		assertEquals(null, emp.getDob());
 	}
 	
-	@Ignore
-	@Test(expected = IllegalArgumentException.class)
-	public void employeeMustBeBornBeforeStartingWork() {
-		emp.setStartDate("01-01-2016");
-		emp.setDob("30-12-2017");
+	@Test(expected = UnderMinimumAgeException.class)
+	public void employeeMustBeOverSixteen() throws Exception {
+		String now = LocalDate.now().format(DateTimeFormatter.ofPattern("d-MM-yyyy"));
+		emp.setEmployeeDob(now);
+		fail("employee must be over sixteen");
+	}
+	
+	@Test(expected = StartWorkDateException.class)
+	public void employeeMustBeBornBeforeStartingWork() throws Exception {
+		emp.setStartDate("01-01-1950");
+		emp.setEmployeeDob("01-01-1960");
 		fail("Employee should be born before start date");
 	}
 }
