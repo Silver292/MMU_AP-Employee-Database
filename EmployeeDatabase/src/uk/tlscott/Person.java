@@ -16,48 +16,6 @@ public class Person {
 	}
 
 	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return the gender
-	 */
-	public char getGender() {
-		return gender;
-	}
-
-	/**
-	 * @return the natInscNo
-	 */
-	public String getNatInscNo() {
-		return natInscNo;
-	}
-
-	/**
-	 * @return the dob
-	 */
-	public String getDob() {
-		return dob;
-	}
-
-	/**
-	 * @return the address
-	 */
-	public String getAddress() {
-		return address;
-	}
-
-	/**
-	 * @return the postcode
-	 */
-	public String getPostcode() {
-		return postcode;
-	}
-
-	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
@@ -65,10 +23,24 @@ public class Person {
 	}
 
 	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
 	 * @param gender the gender to set
 	 */
 	public void setGender(char gender) {
 		this.gender = gender;
+	}
+
+	/**
+	 * @return the gender
+	 */
+	public char getGender() {
+		return gender;
 	}
 
 	/**
@@ -93,10 +65,24 @@ public class Person {
 	}
 
 	/**
+	 * @return the natInscNo
+	 */
+	public String getNatInscNo() {
+		return natInscNo;
+	}
+
+	/**
 	 * @param dob the dob to set
 	 */
 	public void setDob(String dob) {
 		this.dob = dob;
+	}
+
+	/**
+	 * @return the dob
+	 */
+	public String getDob() {
+		return dob;
 	}
 
 	/**
@@ -107,10 +93,24 @@ public class Person {
 	}
 
 	/**
+	 * @return the address
+	 */
+	public String getAddress() {
+		return address;
+	}
+
+	/**
 	 * @param postcode the postcode to set
 	 */
 	public void setPostcode(String postcode) {
 		this.postcode = postcode;
+	}
+
+	/**
+	 * @return the postcode
+	 */
+	public String getPostcode() {
+		return postcode;
 	}
 
 	/* (non-Javadoc)

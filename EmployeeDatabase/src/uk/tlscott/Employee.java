@@ -16,50 +16,18 @@ public class Employee extends Person {
 	}
 
 	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @return the salary
-	 */
-	public String getSalary() {
-		return salary;
-	}
-
-	/**
-	 * @return the startDate
-	 */
-	public String getStartDate() {
-		return startDate;
-	}
-
-	/**
-	 * @return the title
-	 */
-	public String getTitle() {
-		return title;
-	}
-
-	/**
-	 * @return the email
-	 */
-	public String getEmail() {
-		return email;
-	}
-
-	public File getImageFile() {
-		return this.imageFile;
-	}
-
-	/**
 	 * @param id
 	 *            the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
 	}
 
 	/**
@@ -71,11 +39,25 @@ public class Employee extends Person {
 	}
 
 	/**
+	 * @return the salary
+	 */
+	public String getSalary() {
+		return salary;
+	}
+
+	/**
 	 * @param startDate
 	 *            the startDate to set
 	 */
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
+	}
+
+	/**
+	 * @return the startDate
+	 */
+	public String getStartDate() {
+		return startDate;
 	}
 
 	/**
@@ -87,6 +69,13 @@ public class Employee extends Person {
 	}
 
 	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
 	 * @param email
 	 *            the email to set
 	 */
@@ -94,10 +83,21 @@ public class Employee extends Person {
 		this.email = email;
 	}
 
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
 	public void setImage(File file) {
 		this.imageFile = file;
 	}
 	
+	public File getImageFile() {
+		return this.imageFile;
+	}
+
 	public boolean hasImage() {
 		return this.imageFile != null;
 	}
