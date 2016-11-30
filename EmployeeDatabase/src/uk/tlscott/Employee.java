@@ -104,8 +104,8 @@ public class Employee extends Person {
 	/**
 	 * @return the startDate
 	 */
-	public String getStartDate() {
-		return startDate;
+	public LocalDate getStartDate() {
+		return LocalDate.parse(startDate, dateFormat);
 	}
 
 	/**

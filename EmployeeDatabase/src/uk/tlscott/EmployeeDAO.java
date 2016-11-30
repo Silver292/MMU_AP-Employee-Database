@@ -333,12 +333,12 @@ public class EmployeeDAO {
 	private void setPreparedStatement(Employee emp) throws SQLException {
 		pstmt.setString(1, emp.getName());
 		pstmt.setString(2, String.valueOf(emp.getGender()));
-		pstmt.setString(3, emp.getDob());
+		pstmt.setString(3, emp.getDob().toString());
 		pstmt.setString(4, emp.getAddress());
 		pstmt.setString(5, emp.getPostcode());
 		pstmt.setString(6, emp.getNatInscNo());
 		pstmt.setString(7, emp.getTitle());
-		pstmt.setString(8, emp.getStartDate());
+		pstmt.setString(8, emp.getStartDate().toString());
 		pstmt.setString(9, emp.getSalary());
 		pstmt.setString(10, emp.getEmail());
         pstmt.setBytes(11, readFile(emp.getImageFile()));

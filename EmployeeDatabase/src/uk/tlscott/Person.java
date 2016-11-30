@@ -13,7 +13,7 @@ public class Person {
 	private String address;
 	private String postcode;
 	
-	protected DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d-MM-yyyy");
+	protected DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
 	public Person() {
 		super();
@@ -85,8 +85,8 @@ public class Person {
 	/**
 	 * @return the dob
 	 */
-	public String getDob() {
-		return dob == null ? null : dob.format(dateFormat);
+	public LocalDate getDob() {
+		return dob;
 	}
 
 	/**

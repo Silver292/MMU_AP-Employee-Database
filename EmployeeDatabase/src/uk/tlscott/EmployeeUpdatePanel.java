@@ -306,14 +306,13 @@ public class EmployeeUpdatePanel extends JPanel{
 	private void clearFields() {
 		employee = new Employee();
 		String empty = "";
-		String emptyDate = "1-1-2016";
 		nameTextBox.setText(empty);
 		maleRadio.setSelected(true);
-		dobDate.setDate(emptyDate);
+		dobDate.setDate(null);
 		salaryTextBox.setText(empty);
 		ninTextBox.setText(empty);
 		emailTextBox.setText(empty);
-		startDate.setDate(emptyDate);
+		startDate.setDate(null);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
 		imageLabel.setDefaultImage();

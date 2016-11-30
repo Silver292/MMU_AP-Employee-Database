@@ -4,9 +4,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -23,16 +26,14 @@ public class DatePicker extends JPanel{
 	private JComboBox<String> dayBox; 
 	private JComboBox<String> monthBox;
 	private JComboBox<String> yearBox;
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("d-M-Y");
 	private Calendar cal = Calendar.getInstance();
-
 	
 	public DatePicker() {
 		super();
 		
 		setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		
-		// get max days in month - only days need to change if m/y changes function?
+		// get max days in month
 		String[] days = populateDays(cal);
 
 		
@@ -65,7 +66,7 @@ public class DatePicker extends JPanel{
 		((JLabel)yearBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
 		
 		// set combo boxes
-		setDate(today());
+		setDate(LocalDate.now());
 		
 		// add action listeners
 		monthBox.addActionListener(new DateListener(dayBox, monthBox, yearBox));
@@ -90,20 +91,21 @@ public class DatePicker extends JPanel{
 	
 	
 	// Sets the date combo boxes based on the string passed.
-	// parameter must be in the format "d-M-Y" i.e. "01-06-1998"
-	public void setDate(String date) {
+	public void setDate(LocalDate date) {
 		if (date == null)
-			date = today();
+			date = LocalDate.now();
 		
-		String[] dates = date.split("-");
+		String dateString = date.format(DateTimeFormatter.ofPattern("d-M-yyyy"));		
 		
-		dayBox.setSelectedItem(dates[0]);
-		monthBox.setSelectedItem(dates[1]);
+		String[] dates = dateString.split("-");
+		
 		yearBox.setSelectedItem(dates[2]);
+		monthBox.setSelectedItem(dates[1]);
+		dayBox.setSelectedItem(dates[0]);
 	}
 	
 	// Updates the days in the month depending on the month and year, handles leap years
-	public class DateListener implements ActionListener {
+	private class DateListener implements ActionListener {
 		private JComboBox<String> yearBox;
 		private JComboBox<String> monthBox;
 		private JComboBox<String> dayBox;
@@ -117,16 +119,14 @@ public class DatePicker extends JPanel{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Calendar date = Calendar.getInstance();
+			int firstDayOfMonth = 1;
 			int selectedMonth = Integer.parseInt((String)monthBox.getSelectedItem()) - 1; // Calendar months are zero indexed i.e. 0 is January
 			int selectedYear  = Integer.parseInt((String)yearBox.getSelectedItem());
-			date.set(selectedYear, selectedMonth, 1);
+			date.set(selectedYear, selectedMonth, firstDayOfMonth);
 
-			String[] days = populateDays(date);
-			dayBox.removeAllItems();
+			DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>(populateDays(date));
+			dayBox.setModel(model);
 			
-			for (int i = 0; i < days.length; i++) {
-				dayBox.addItem(days[i]);
-			}
 		};
 	}
 
@@ -134,11 +134,9 @@ public class DatePicker extends JPanel{
 		String day = (String)dayBox.getSelectedItem();
 		String month = (String)monthBox.getSelectedItem();
 		String year = (String)yearBox.getSelectedItem();
-		return String.format("%s-%s-%s", day, month, year);
+		
+		int dayInt = Integer.parseInt(day);
+		int monthInt = Integer.parseInt(month);
+		return String.format("%s-%02d-%02d", year, monthInt, dayInt);
 	}
-	
-	private String today() {
-		return dateFormat.format(cal.getTime());
-	}
-
 }
