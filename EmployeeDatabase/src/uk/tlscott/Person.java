@@ -7,9 +7,11 @@ public class Person {
 	private String name;
 	private char gender;
 	private String natInscNo;
-	private String dob;
+	protected LocalDate dob;
 	private String address;
 	private String postcode;
+	
+	protected DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d-MM-yyyy");
 	
 	public Person() {
 		super();
@@ -75,14 +77,14 @@ public class Person {
 	 * @param dob the dob to set
 	 */
 	public void setDob(String dob) {
-		this.dob = dob;
+		this.dob = dob == null ? null : LocalDate.parse(dob, dateFormat);
 	}
 
 	/**
 	 * @return the dob
 	 */
 	public String getDob() {
-		return dob;
+		return dob == null ? null : dob.format(dateFormat);
 	}
 
 	/**
