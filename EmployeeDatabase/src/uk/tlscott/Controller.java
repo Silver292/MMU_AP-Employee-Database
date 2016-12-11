@@ -38,7 +38,11 @@ public class Controller {
 		emp.setPostcode("HG4 2RD");
 		emp.setNatInscNo("AB185469A");
 		emp.setTitle("Administrator");
-		emp.setStartDate("2012-01-08");
+		try {
+			emp.setStartDate("2012-01-08");
+		} catch (StartWorkDateException e1) {
+			System.out.println(e1.getMessage());
+		}
 		emp.setSalary("23000");
 		emp.setEmail("Jack@example.com");
 		

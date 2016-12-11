@@ -102,7 +102,12 @@ public class EmployeeUpdatePanel extends JPanel{
 				employee.setSalary(salaryTextBox.getText());
 				employee.setNatInscNo(ninTextBox.getText());
 				employee.setEmail(emailTextBox.getText());
-				employee.setStartDate(startDate.getDate());
+				try {
+					employee.setStartDate(startDate.getDate());
+				} catch (StartWorkDateException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage());
+					return;
+				}
 				employee.setTitle(jobTitleTextBox.getText());
 				
 				// check if employee has an id, if not create new employee

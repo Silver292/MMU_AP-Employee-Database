@@ -40,7 +40,7 @@ public class EmployeeDAOTest {
 	}
 
     @Test
-	public void selectAllEmployeesReturnsExpected() {
+	public void selectAllEmployeesReturnsExpected() throws Exception {
 		ArrayList<Employee> empList = new ArrayList<Employee>();
 		empList = db.selectAllEmployees();
 		assertNotNull(empList);
@@ -108,7 +108,7 @@ public class EmployeeDAOTest {
 	}
 	
 	@Test
-	public void updateEmployeeShouldChangeDetailsOnDatabase() {
+	public void updateEmployeeShouldChangeDetailsOnDatabase() throws Exception {
 		Employee testEmp = db.selectEmployeeById(1);
 		assertEquals("salary should be ", "30000", testEmp.getSalary());
 		testEmp.setSalary("50000");
@@ -119,7 +119,7 @@ public class EmployeeDAOTest {
 		assertEquals("salary should be ", "50000", testEmp.getSalary());
 	}
 
-	private Employee getTestEmployee() {
+	private Employee getTestEmployee() throws Exception  {
 		Employee testEmp = new Employee();
 		testEmp.setName("Test Name");
 		testEmp.setAddress("Manchester");

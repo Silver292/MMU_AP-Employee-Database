@@ -319,7 +319,11 @@ public class EmployeeDAO {
 		emp.setPostcode(r.getString("Postcode"));
 		emp.setNatInscNo(r.getString("NIN"));
 		emp.setTitle(r.getString("JobTitle"));
-		emp.setStartDate(r.getString("StartDate"));
+		try {
+			emp.setStartDate(r.getString("StartDate"));
+		} catch (StartWorkDateException e) {
+			LOGGER.log(Level.INFO, e.getMessage(), e);
+		}
 		emp.setSalary(r.getString("Salary"));
 		emp.setEmail(r.getString("Email"));
 		emp.setImage(getImageFile(emp));
