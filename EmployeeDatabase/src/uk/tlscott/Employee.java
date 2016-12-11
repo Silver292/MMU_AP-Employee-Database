@@ -8,7 +8,7 @@ public class Employee extends Person {
 	private static final long MINIMUM_WORKING_AGE = 16;
 	private String id;
 	private String salary;
-	private String startDate;
+	private LocalDate startDate;
 	private String title;
 	private String email;
 	private File   imageFile;
@@ -46,20 +46,13 @@ public class Employee extends Person {
 		}
 		
 		// if born after starting work throw error
-		if (startDate != null && date.isAfter(LocalDate.parse(this.startDate, dateFormat))) {
+		if (startDate != null && date.isAfter(this.startDate)) {
 			throw new StartWorkDateException("Employees must be born before starting work.");
 		}
 		
 		super.setDob(dob);
 	}
 	
-	// Checks that the employee is at least minimum working age. 
-	// Employees can start work on their birthday
-	private boolean isUnderLegalAge(LocalDate dob) {
-		LocalDate minBirthDate = LocalDate.now().minusYears(MINIMUM_WORKING_AGE);
-		return minBirthDate.isBefore(dob);
-	}
-
 	/**
 	 * @param id
 	 *            the id to set
@@ -95,9 +88,21 @@ public class Employee extends Person {
 	/**
 	 * @param startDate
 	 *            the startDate to set
+	 * @throws StartWorkDateException 
 	 */
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	public void setStartDate(String startDate) throws StartWorkDateException {
+		if(startDate == null){
+			this.startDate = null;
+			return;
+		}
+		
+		LocalDate date = LocalDate.parse(startDate, dateFormat);
+				
+		if (dob != null && date.isBefore(this.dob)) {
+			throw new StartWorkDateException("Employees must be born before starting work.");
+		}
+		
+		this.startDate = LocalDate.parse(startDate, dateFormat);
 	}
 	
 
@@ -105,7 +110,7 @@ public class Employee extends Person {
 	 * @return the startDate
 	 */
 	public LocalDate getStartDate() {
-		return LocalDate.parse(startDate, dateFormat);
+		return startDate;
 	}
 
 	/**
@@ -161,6 +166,13 @@ public class Employee extends Person {
 	public String toString() {
 		return super.toString() + "\n\tI.D: " + id + "\n\tSalary: " + salary + "\n\tStart Date: " + startDate + "\n\tTitle: "
 				+ title + "\n\tEmail: " + email;
+	}
+
+	// Checks that the employee is at least minimum working age. 
+	// Employees can start work on their birthday
+	private boolean isUnderLegalAge(LocalDate dob) {
+		LocalDate minBirthDate = LocalDate.now().minusYears(MINIMUM_WORKING_AGE);
+		return minBirthDate.isBefore(dob);
 	}
 
 }

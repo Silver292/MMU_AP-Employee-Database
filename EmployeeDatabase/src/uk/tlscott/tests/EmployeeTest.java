@@ -107,4 +107,25 @@ public class EmployeeTest {
 		emp.setEmployeeDob("1960-01-01");
 		fail("Employee should be born before start date");
 	}
+	
+	// Start date
+	
+	@Test
+	public void canSetStartDate() throws Exception {
+		emp.setStartDate("2010-05-10");
+		assertEquals("2010-05-10", emp.getStartDate().toString());
+	}
+	
+	@Test
+	public void startDateCanBeNull() throws Exception {
+		emp.setStartDate(null);
+		assertEquals(null, emp.getStartDate());
+	}
+	
+	@Test(expected = StartWorkDateException.class)
+	public void employeeMustStartWorkAfterBeingBorn() throws Exception {
+		emp.setDob("1960-01-01");
+		emp.setStartDate("1950-01-01");
+		fail("Employee must start work after date of birth");
+	}
 }
