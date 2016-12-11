@@ -132,10 +132,4 @@ public class EmployeeTest {
 		emp.setStartDate("1950-01-01");
 		fail("Employee must start work after date of birth");
 	}
-	
-	@Test
-	public void ageTest() throws Exception {
-		assertFalse("this is over sixteen", emp.underWorkingAge(LocalDate.of(2000, 1, 1), LocalDate.of(2016, 01, 01)));
-		assertTrue("this is under sixteen", emp.underWorkingAge(LocalDate.of(2010, 01, 01), LocalDate.of(2016, 01, 01)));
-	}
 }

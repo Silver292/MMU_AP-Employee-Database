@@ -167,7 +167,7 @@ public class Employee extends Person {
 
 	// Checks that the employee is at least minimum working age. 
 	// Employees can start work on their birthday
-	public boolean underWorkingAge(LocalDate dob, LocalDate startDate) {
+	private boolean underWorkingAge(LocalDate dob, LocalDate startDate) {
 		if(dob == null || startDate == null) return false; // can't check without both
 		
 		return dob.isAfter(startDate.minusYears(MINIMUM_WORKING_AGE));
