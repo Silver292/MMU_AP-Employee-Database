@@ -12,6 +12,7 @@ public class Controller {
 		ArrayList<Employee> employees;
 
 		// Test selectAllEmployees
+		System.out.println("Selecting all employees: \n\n");
 		employees = db.selectAllEmployees();
 		for (Employee e : employees) {
 			System.out.println(e);
@@ -30,7 +31,7 @@ public class Controller {
 			System.out.println("FAILURE: Employee " + empName + " could not be selected.");
 		}
 
-		// Update employee
+		// create employee
 		emp.setName("Jack Henderson");
 		emp.setGender('M');
 		try {
@@ -50,15 +51,14 @@ public class Controller {
 		emp.setSalary("23000");
 		emp.setEmail("Jack@example.com");
 		
-		
-		String id = "4";
-		
 		// Test insert employee
 		if (db.insertEmployee(emp)) {
 			System.out.println("SUCCESS: Employee " + emp.getName() + " inserted.");
 		} else {
 			System.out.println("FAILURE: Employee " + emp.getName() + " insertion failed.");
 		}
+		
+		String id = db.selectEmployeeByName(emp.getName()).getId();
 		
 		// Test deleteEmployeeAtId
 		if (db.deleteEmployeeById(id)) {
