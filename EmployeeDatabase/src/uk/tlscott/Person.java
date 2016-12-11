@@ -50,7 +50,7 @@ public class Person {
 	/**
 	 * @param natInscNo the natInscNo to set
 	 */
-	public void setNatInscNo(String natInscNo) throws IllegalArgumentException{
+	public void setNatInscNo(String natInscNo) throws InvalidNationalInsuranceException{
 		// Allow field to be null or empty string
 		if (natInscNo == null || natInscNo.equals("")) {
 			this.natInscNo = natInscNo;
@@ -65,7 +65,7 @@ public class Person {
 			this.natInscNo = natInscNo;
 			return;
 		}
-		throw new IllegalArgumentException("Invalid national insurance number");
+		throw new InvalidNationalInsuranceException("Invalid national insurance number");
 	}
 
 	/**

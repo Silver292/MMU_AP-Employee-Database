@@ -90,7 +90,12 @@ public class EmployeeUpdatePanel extends JPanel{
 				
 				employee.setName(nameTextBox.getText());
 				employee.setSalary(salaryTextBox.getText());
-				employee.setNatInscNo(ninTextBox.getText());
+				try {
+					employee.setNatInscNo(ninTextBox.getText());
+				} catch (InvalidNationalInsuranceException e2) {
+					JOptionPane.showMessageDialog(null, e2.getMessage());
+					return;
+				}
 				employee.setEmail(emailTextBox.getText());
 				try {
 					employee.setEmployeeDob(dobDate.getDate());

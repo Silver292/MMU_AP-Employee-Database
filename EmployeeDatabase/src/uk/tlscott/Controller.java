@@ -41,7 +41,11 @@ public class Controller {
 		} 
 		emp.setAddress("York");
 		emp.setPostcode("HG4 2RD");
-		emp.setNatInscNo("AB185469A");
+		try {
+			emp.setNatInscNo("AB185469A");
+		} catch (InvalidNationalInsuranceException e1) {
+			System.out.println(e1.getMessage());
+		}
 		emp.setTitle("Administrator");
 		emp.setSalary("23000");
 		emp.setEmail("Jack@example.com");

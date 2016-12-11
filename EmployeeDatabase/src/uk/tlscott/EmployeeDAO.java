@@ -315,16 +315,20 @@ public class EmployeeDAO {
 		emp.setDob(r.getString("DOB"));
 		emp.setAddress(r.getString("Address"));
 		emp.setPostcode(r.getString("Postcode"));
-		emp.setNatInscNo(r.getString("NIN"));
 		emp.setTitle(r.getString("JobTitle"));
+		emp.setSalary(r.getString("Salary"));
+		emp.setEmail(r.getString("Email"));
+		emp.setImage(getImageFile(emp));
+		try {
+			emp.setNatInscNo(r.getString("NIN"));
+		} catch (InvalidNationalInsuranceException e1) {
+			LOGGER.log(Level.INFO, e1.getMessage(), e1);
+		}
 		try {
 			emp.setStartDate(r.getString("StartDate"));
 		} catch (UnderMinimumAgeException e) {
 			LOGGER.log(Level.INFO, e.getMessage(), e);
 		}
-		emp.setSalary(r.getString("Salary"));
-		emp.setEmail(r.getString("Email"));
-		emp.setImage(getImageFile(emp));
 		return emp;
 	}
 
