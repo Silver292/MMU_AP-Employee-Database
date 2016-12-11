@@ -13,10 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 public class EmployeeDAO {
 	Connection c;
@@ -355,8 +353,7 @@ public class EmployeeDAO {
 	private File getImageFile(Employee emp) throws SQLException {
 		File file = new File("./assets/empImage" + emp.getId() + ".jpg");
 		
-		try {
-			FileOutputStream fos = new FileOutputStream(file);
+		try (FileOutputStream fos = new FileOutputStream(file)){
 			InputStream input = r.getBinaryStream("Image");
 			if(input != null) {
 				// write to file from database
@@ -382,8 +379,7 @@ public class EmployeeDAO {
     	if (file == null) return null;
     	
         ByteArrayOutputStream bos = null;
-        try {
-            FileInputStream fis = new FileInputStream(file);
+        try ( FileInputStream fis = new FileInputStream(file)){
             byte[] buffer = new byte[1024];
             bos = new ByteArrayOutputStream();
             for (int len; (len = fis.read(buffer)) != -1;) {

@@ -1,14 +1,8 @@
 package uk.tlscott.spike;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.util.Calendar;
 
 public class DateSpike {
 
@@ -32,8 +26,6 @@ public class DateSpike {
 		LocalDate youngDOB = LocalDate.of(2011, 01, 01);
 		LocalDate birthdayDOB = LocalDate.of(2000, 11, 30);
 		LocalDate oldDOB = LocalDate.of(1988, 05, 30);
-		
-		LocalDate dob = youngDOB;
 		
 		System.out.println("Test young");
 		canWork(youngDOB);
