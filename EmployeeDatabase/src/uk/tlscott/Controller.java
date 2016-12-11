@@ -33,16 +33,16 @@ public class Controller {
 		// Update employee
 		emp.setName("Jack Henderson");
 		emp.setGender('M');
-		emp.setDob("1965-05-25");
+		try {
+			emp.setEmployeeDob("1965-05-25");
+			emp.setStartDate("2012-01-08");
+		} catch (UnderMinimumAgeException e1) {
+			System.out.println(e1.getMessage());
+		} 
 		emp.setAddress("York");
 		emp.setPostcode("HG4 2RD");
 		emp.setNatInscNo("AB185469A");
 		emp.setTitle("Administrator");
-		try {
-			emp.setStartDate("2012-01-08");
-		} catch (StartWorkDateException e1) {
-			System.out.println(e1.getMessage());
-		}
 		emp.setSalary("23000");
 		emp.setEmail("Jack@example.com");
 		

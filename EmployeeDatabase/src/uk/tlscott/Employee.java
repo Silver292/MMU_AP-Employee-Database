@@ -31,7 +31,7 @@ public class Employee extends Person {
 	 * @throws UnderMinimumAgeException
 	 * @throws StartWorkDateException
 	 */
-	public void setEmployeeDob(String dob) throws UnderMinimumAgeException, StartWorkDateException {
+	public void setEmployeeDob(String dob) throws UnderMinimumAgeException {
 		// if null set to null
 		if (dob == null){
 			this.dob = null;
@@ -40,14 +40,9 @@ public class Employee extends Person {
 		
 		LocalDate date = LocalDate.parse(dob, dateFormat);
 		
-		// if under age throw error
-		if (isUnderLegalAge(date)) {
+		// check over minimum working age
+		if(underWorkingAge(date, this.startDate)) {
 			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
-		}
-		
-		// if born after starting work throw error
-		if (startDate != null && date.isAfter(this.startDate)) {
-			throw new StartWorkDateException("Employees must be born before starting work.");
 		}
 		
 		super.setDob(dob);
@@ -89,8 +84,9 @@ public class Employee extends Person {
 	 * @param startDate
 	 *            the startDate to set
 	 * @throws StartWorkDateException 
+	 * @throws UnderMinimumAgeException 
 	 */
-	public void setStartDate(String startDate) throws StartWorkDateException {
+	public void setStartDate(String startDate) throws UnderMinimumAgeException {
 		if(startDate == null){
 			this.startDate = null;
 			return;
@@ -98,11 +94,12 @@ public class Employee extends Person {
 		
 		LocalDate date = LocalDate.parse(startDate, dateFormat);
 				
-		if (dob != null && date.isBefore(this.dob)) {
-			throw new StartWorkDateException("Employees must be born before starting work.");
+		// check over minimum working age
+		if(underWorkingAge(this.dob, date)) {
+			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
 		}
 		
-		this.startDate = LocalDate.parse(startDate, dateFormat);
+		this.startDate = date;
 	}
 	
 
@@ -170,9 +167,10 @@ public class Employee extends Person {
 
 	// Checks that the employee is at least minimum working age. 
 	// Employees can start work on their birthday
-	private boolean isUnderLegalAge(LocalDate dob) {
-		LocalDate minBirthDate = LocalDate.now().minusYears(MINIMUM_WORKING_AGE);
-		return minBirthDate.isBefore(dob);
+	public boolean underWorkingAge(LocalDate dob, LocalDate startDate) {
+		if(dob == null || startDate == null) return false; // can't check without both
+		
+		return dob.isAfter(startDate.minusYears(MINIMUM_WORKING_AGE));
 	}
-
+	
 }

@@ -98,16 +98,16 @@ public class EmployeeUpdatePanel extends JPanel{
 				employee.setGender(gender);
 				
 				employee.setName(nameTextBox.getText());
-				employee.setDob(dobDate.getDate());
 				employee.setSalary(salaryTextBox.getText());
 				employee.setNatInscNo(ninTextBox.getText());
 				employee.setEmail(emailTextBox.getText());
 				try {
+					employee.setEmployeeDob(dobDate.getDate());
 					employee.setStartDate(startDate.getDate());
-				} catch (StartWorkDateException e1) {
+				} catch (UnderMinimumAgeException e1 ) {
 					JOptionPane.showMessageDialog(null, e1.getMessage());
 					return;
-				}
+				} 
 				employee.setTitle(jobTitleTextBox.getText());
 				
 				// check if employee has an id, if not create new employee

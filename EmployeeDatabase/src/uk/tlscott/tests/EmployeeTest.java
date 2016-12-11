@@ -2,20 +2,17 @@ package uk.tlscott.tests;
 
 import static org.junit.Assert.*;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.tlscott.Employee;
-import uk.tlscott.StartWorkDateException;
 import uk.tlscott.UnderMinimumAgeException;
 
 public class EmployeeTest {
 
+	private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Employee emp = new Employee();
 	
 	// NIN
@@ -95,13 +92,20 @@ public class EmployeeTest {
 	}
 	
 	@Test(expected = UnderMinimumAgeException.class)
-	public void employeeMustBeOverSixteen() throws Exception {
-		String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		emp.setEmployeeDob(now);
+	public void employeeMustBeOverSixteen_WhenStartingWork() throws Exception {
+		LocalDate date = LocalDate.of(1998, 1, 1);
+		emp.setEmployeeDob(date.format(dateFormat));
+
+		// Start work at age one
+		date.plusYears(1);
+		emp.setStartDate(date.format(dateFormat));
+		
 		fail("employee must be over sixteen");
 	}
 	
-	@Test(expected = StartWorkDateException.class)
+	
+	
+	@Test(expected = UnderMinimumAgeException.class)
 	public void employeeMustBeBornBeforeStartingWork() throws Exception {
 		emp.setStartDate("1950-01-01");
 		emp.setEmployeeDob("1960-01-01");
@@ -122,10 +126,16 @@ public class EmployeeTest {
 		assertEquals(null, emp.getStartDate());
 	}
 	
-	@Test(expected = StartWorkDateException.class)
+	@Test(expected = UnderMinimumAgeException.class)
 	public void employeeMustStartWorkAfterBeingBorn() throws Exception {
 		emp.setDob("1960-01-01");
 		emp.setStartDate("1950-01-01");
 		fail("Employee must start work after date of birth");
+	}
+	
+	@Test
+	public void ageTest() throws Exception {
+		assertFalse("this is over sixteen", emp.underWorkingAge(LocalDate.of(2000, 1, 1), LocalDate.of(2016, 01, 01)));
+		assertTrue("this is under sixteen", emp.underWorkingAge(LocalDate.of(2010, 01, 01), LocalDate.of(2016, 01, 01)));
 	}
 }

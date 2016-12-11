@@ -321,7 +321,7 @@ public class EmployeeDAO {
 		emp.setTitle(r.getString("JobTitle"));
 		try {
 			emp.setStartDate(r.getString("StartDate"));
-		} catch (StartWorkDateException e) {
+		} catch (UnderMinimumAgeException e) {
 			LOGGER.log(Level.INFO, e.getMessage(), e);
 		}
 		emp.setSalary(r.getString("Salary"));

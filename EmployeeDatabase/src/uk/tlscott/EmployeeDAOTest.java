@@ -123,7 +123,7 @@ public class EmployeeDAOTest {
 		Employee testEmp = new Employee();
 		testEmp.setName("Test Name");
 		testEmp.setAddress("Manchester");
-		testEmp.setDob("25-10-1990");
+		testEmp.setEmployeeDob("25-10-1990");
 		testEmp.setEmail("test@example.com");
 		testEmp.setGender('M');
 		testEmp.setId("16");
