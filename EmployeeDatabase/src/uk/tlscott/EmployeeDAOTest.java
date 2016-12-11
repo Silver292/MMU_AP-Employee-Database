@@ -55,21 +55,21 @@ public class EmployeeDAOTest {
 		assertEquals("id should match", "1", testEmp.getId());
 		assertEquals("name should match", "Alan Crispin", testEmp.getName());
 		assertEquals("gender should match", 'M', testEmp.getGender());
-		assertEquals("dob should match", "14-03-1960", testEmp.getDob());
+		assertEquals("dob should match", "1960-03-14", testEmp.getDob().toString());
 		assertEquals("address should match", "Leeds", testEmp.getAddress());
 		assertEquals("postcode should match", "LS1 1HE", testEmp.getPostcode());
-		assertEquals("nin should match", "QQ123456C", testEmp.getNatInscNo());
+		assertEquals("nin should match", "LR338036D", testEmp.getNatInscNo());
 		assertEquals("job title should match", "Lecturer", testEmp.getTitle());
-		assertEquals("start date should match", "01-09-2010", testEmp.getStartDate());
+		assertEquals("start date should match", "2010-09-01", testEmp.getStartDate().toString());
 		assertEquals("salary should match", "30000", testEmp.getSalary());
 		assertEquals("email should match", "alan@example.com", testEmp.getEmail());
 	}
-	
+
 	@Test
 	public void employeeInsertionAddsEmployee() throws Exception {
 		Employee newEmp = getTestEmployee();
 		
-		assertTrue(db.insertEmployee(newEmp));
+		assertNotEquals(0, db.insertEmployee(newEmp));
 		Employee tempEmp = db.selectEmployeeByName(newEmp.getName());
 		assertEquals("selected employee name matches", newEmp.getName(), tempEmp.getName());
 	}
@@ -84,17 +84,6 @@ public class EmployeeDAOTest {
 		assertNull("returns null as not found", db.selectEmployeeByName(toBeDeleted.getName()));
 	}
 	
-	@Test
-	@Ignore
-	public void insertEmployeeAtIDInsertsAtCorrectID() throws Exception {
-		Employee tempEmp = getTestEmployee();
-		Employee selectedEmp;
-		
-//		assertTrue(db.insertEmployeeAtID(tempEmp, "16"));
-		assertNotNull("Returns an employee", selectedEmp = db.selectEmployeeById(16));
-		assertEquals(tempEmp.getName(), selectedEmp.getName());
-	}
-
 	@Test
 	public void checkConnectionsAreClosedAfterOperation() throws Exception {
 		@SuppressWarnings("unused")
@@ -123,12 +112,12 @@ public class EmployeeDAOTest {
 		Employee testEmp = new Employee();
 		testEmp.setName("Test Name");
 		testEmp.setAddress("Manchester");
-		testEmp.setEmployeeDob("25-10-1990");
+		testEmp.setEmployeeDob("1990-10-25");
 		testEmp.setEmail("test@example.com");
 		testEmp.setGender('M');
 		testEmp.setId("16");
-		testEmp.setNatInscNo("GH852468J");
-		testEmp.setStartDate("05-04-2010");
+		testEmp.setNatInscNo("TX339203D");
+		testEmp.setStartDate("2010-04-05");
 		testEmp.setSalary("16000");
 		testEmp.setTitle("Intern");
 		return testEmp;

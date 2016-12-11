@@ -60,8 +60,10 @@ public class EmployeeDAO {
 			// ignored
 		}
 	}
-	
-	public boolean insertEmployee(Employee emp) {
+	// returns generated id
+	public int insertEmployee(Employee emp) {
+		int generatedKey = 0;
+		
 		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
 				+ "VALUES "
@@ -71,13 +73,16 @@ public class EmployeeDAO {
 			pstmt = c.prepareStatement(sql);
 	        setPreparedStatement(emp);
 			pstmt.executeUpdate();
-			return true;
+			r = pstmt.getGeneratedKeys();
+			if(r.next()){
+				generatedKey = r.getInt(1);
+			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error inserting employee", e);
 		} finally {
 			this.closeConnection();
 		}
-		return false;
+		return generatedKey;
 	}
 
 	public boolean updateEmployee(Employee emp) {
