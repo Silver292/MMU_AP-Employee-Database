@@ -83,9 +83,9 @@ public class EmployeeTest {
 	
 	@Test
 	public void canSetEmployeeDOB() throws Exception {
-		String date = "1-01-1964";
+		String date = "1964-01-01";
 		emp.setEmployeeDob(date);
-		assertEquals(date, emp.getDob());
+		assertEquals(date, emp.getDob().toString());
 	}
 	
 	@Test
@@ -96,15 +96,15 @@ public class EmployeeTest {
 	
 	@Test(expected = UnderMinimumAgeException.class)
 	public void employeeMustBeOverSixteen() throws Exception {
-		String now = LocalDate.now().format(DateTimeFormatter.ofPattern("d-MM-yyyy"));
+		String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		emp.setEmployeeDob(now);
 		fail("employee must be over sixteen");
 	}
 	
 	@Test(expected = StartWorkDateException.class)
 	public void employeeMustBeBornBeforeStartingWork() throws Exception {
-		emp.setStartDate("01-01-1950");
-		emp.setEmployeeDob("01-01-1960");
+		emp.setStartDate("1950-01-01");
+		emp.setEmployeeDob("1960-01-01");
 		fail("Employee should be born before start date");
 	}
 }

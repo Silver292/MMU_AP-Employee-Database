@@ -31,15 +31,14 @@ public class Controller {
 		}
 
 		// Update employee
-		emp.setId("4");
 		emp.setName("Jack Henderson");
 		emp.setGender('M');
-		emp.setDob("25-04-1965");
+		emp.setDob("1965-05-25");
 		emp.setAddress("York");
 		emp.setPostcode("HG4 2RD");
-		emp.setNatInscNo("TG185469J");
+		emp.setNatInscNo("AB185469A");
 		emp.setTitle("Administrator");
-		emp.setStartDate("01-08-2010");
+		emp.setStartDate("2012-01-08");
 		emp.setSalary("23000");
 		emp.setEmail("Jack@example.com");
 		
