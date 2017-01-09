@@ -131,12 +131,12 @@ public class SearchPanel extends JPanel{
 			data[0] = employees.get(i).getId();
 			data[1] = employees.get(i).getName();
 			data[2] = String.valueOf(employees.get(i).getGender());
-			data[3] = employees.get(i).getDob();
+			data[3] = employees.get(i).getDob().toString();
 			data[4] = employees.get(i).getAddress();
 			data[5] = employees.get(i).getPostcode();
 			data[6] = employees.get(i).getNatInscNo();
 			data[7] = employees.get(i).getTitle();
-			data[8] = employees.get(i).getStartDate();
+			data[8] = employees.get(i).getStartDate().toString();
 			data[9] = employees.get(i).getSalary();
 			data[10] = employees.get(i).getEmail();
 			
