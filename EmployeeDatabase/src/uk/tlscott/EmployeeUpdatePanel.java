@@ -5,25 +5,16 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -98,17 +89,26 @@ public class EmployeeUpdatePanel extends JPanel{
 				employee.setGender(gender);
 				
 				employee.setName(nameTextBox.getText());
-				employee.setDob(dobDate.getDate());
 				employee.setSalary(salaryTextBox.getText());
-				employee.setNatInscNo(ninTextBox.getText());
+				try {
+					employee.setNatInscNo(ninTextBox.getText());
+				} catch (InvalidNationalInsuranceException e2) {
+					JOptionPane.showMessageDialog(null, e2.getMessage());
+					return;
+				}
 				employee.setEmail(emailTextBox.getText());
-				employee.setStartDate(startDate.getDate());
+				try {
+					employee.setEmployeeDob(dobDate.getDate());
+					employee.setStartDate(startDate.getDate());
+				} catch (UnderMinimumAgeException e1 ) {
+					JOptionPane.showMessageDialog(null, e1.getMessage());
+					return;
+				} 
 				employee.setTitle(jobTitleTextBox.getText());
 				
 				// check if employee has an id, if not create new employee
 				if(employee.getId() == null) {
-					boolean success = dao.insertEmployee(employee);
-					if (!success) {
+					if (dao.insertEmployee(employee) != 0) {
 						JOptionPane.showMessageDialog(null, "There was a problem creating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 					}
 					return;
@@ -306,14 +306,13 @@ public class EmployeeUpdatePanel extends JPanel{
 	private void clearFields() {
 		employee = new Employee();
 		String empty = "";
-		String emptyDate = "1-1-2016";
 		nameTextBox.setText(empty);
 		maleRadio.setSelected(true);
-		dobDate.setDate(emptyDate);
+		dobDate.setDate(null);
 		salaryTextBox.setText(empty);
 		ninTextBox.setText(empty);
 		emailTextBox.setText(empty);
-		startDate.setDate(emptyDate);
+		startDate.setDate(null);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
 		imageLabel.setDefaultImage();

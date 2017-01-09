@@ -13,10 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 public class EmployeeDAO {
 	Connection c;
@@ -62,8 +60,10 @@ public class EmployeeDAO {
 			// ignored
 		}
 	}
+	// returns generated id
+	public int insertEmployee(Employee emp) {
+		int generatedKey = 0;
 	
-	public boolean insertEmployee(Employee emp) {
 		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
 				+ "VALUES "
@@ -73,13 +73,16 @@ public class EmployeeDAO {
 			pstmt = c.prepareStatement(sql);
 	        setPreparedStatement(emp);
 			pstmt.executeUpdate();
-			return true;
+			r = pstmt.getGeneratedKeys();
+			if(r.next()){
+				generatedKey = r.getInt(1);
+			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error inserting employee", e);
 		} finally {
 			this.closeConnection();
 		}
-		return false;
+		return generatedKey;
 	}
 
 	public boolean updateEmployee(Employee emp) {
@@ -317,12 +320,20 @@ public class EmployeeDAO {
 		emp.setDob(r.getString("DOB"));
 		emp.setAddress(r.getString("Address"));
 		emp.setPostcode(r.getString("Postcode"));
-		emp.setNatInscNo(r.getString("NIN"));
 		emp.setTitle(r.getString("JobTitle"));
-		emp.setStartDate(r.getString("StartDate"));
 		emp.setSalary(r.getString("Salary"));
 		emp.setEmail(r.getString("Email"));
 		emp.setImage(getImageFile(emp));
+		try {
+			emp.setNatInscNo(r.getString("NIN"));
+		} catch (InvalidNationalInsuranceException e1) {
+			LOGGER.log(Level.INFO, e1.getMessage(), e1);
+		}
+		try {
+			emp.setStartDate(r.getString("StartDate"));
+		} catch (UnderMinimumAgeException e) {
+			LOGGER.log(Level.INFO, e.getMessage(), e);
+		}
 		return emp;
 	}
 
@@ -333,12 +344,12 @@ public class EmployeeDAO {
 	private void setPreparedStatement(Employee emp) throws SQLException {
 		pstmt.setString(1, emp.getName());
 		pstmt.setString(2, String.valueOf(emp.getGender()));
-		pstmt.setString(3, emp.getDob());
+		pstmt.setString(3, emp.getDob().toString());
 		pstmt.setString(4, emp.getAddress());
 		pstmt.setString(5, emp.getPostcode());
 		pstmt.setString(6, emp.getNatInscNo());
 		pstmt.setString(7, emp.getTitle());
-		pstmt.setString(8, emp.getStartDate());
+		pstmt.setString(8, emp.getStartDate().toString());
 		pstmt.setString(9, emp.getSalary());
 		pstmt.setString(10, emp.getEmail());
         pstmt.setBytes(11, readFile(emp.getImageFile()));
@@ -351,8 +362,7 @@ public class EmployeeDAO {
 	private File getImageFile(Employee emp) throws SQLException {
 		File file = new File("./assets/empImage" + emp.getId() + ".jpg");
 		
-		try {
-			FileOutputStream fos = new FileOutputStream(file);
+		try (FileOutputStream fos = new FileOutputStream(file)){
 			InputStream input = r.getBinaryStream("Image");
 			if(input != null) {
 				// write to file from database
@@ -378,8 +388,7 @@ public class EmployeeDAO {
     	if (file == null) return null;
     	
         ByteArrayOutputStream bos = null;
-        try {
-            FileInputStream fis = new FileInputStream(file);
+        try ( FileInputStream fis = new FileInputStream(file)){
             byte[] buffer = new byte[1024];
             bos = new ByteArrayOutputStream();
             for (int len; (len = fis.read(buffer)) != -1;) {
