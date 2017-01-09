@@ -9,8 +9,6 @@ public class ControllerGUI {
 			public void run() {
 				MainForm frame = new MainForm();
 		
-                frame.pack();
-                
 				frame.setVisible(true);
 			}
 

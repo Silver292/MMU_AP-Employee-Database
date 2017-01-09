@@ -1,4 +1,5 @@
 package uk.tlscott;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,27 +11,43 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import uk.tlscott.spike.SearchPanel;
+
 public class MainForm extends JFrame{
 
+	protected static final String RECORD_VIEW = "View.record";
+    protected static final String SEARCH_VIEW = "View.search";
+	
 	protected EmployeeDAO dao = new EmployeeDAO();
-	private EmployeeUpdatePanel panel = new EmployeeUpdatePanel(dao);
-
+		
+	private CardLayout cardLayout;
+	
+	private EmployeeUpdatePanel panel;
+	private SearchPanel searchPane;
+	
 	private static final long serialVersionUID = 1L;
 
 	public MainForm() {
 		super("Employee Record System");
 
-		setSize(600,400);
+		setSize(665, 425);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// centre frame on screen
-		setLocationRelativeTo(null);
+		setLocationRelativeTo(null);		// centre frame on screen
+		
+		panel = new EmployeeUpdatePanel(dao);
+		searchPane = new SearchPanel();
+		
+		cardLayout = new CardLayout();
+		setLayout(cardLayout);
+
+		add(panel, RECORD_VIEW);
+		add(searchPane, SEARCH_VIEW);
+		
+		panel.setEmployee(dao.selectFirstEmployee());
+		
+		cardLayout.show(getContentPane(), RECORD_VIEW);
 		
 		setUpMenu();
-
-		panel.setEmployee(dao.selectEmployeeById(1));
-		
-		add(panel);
-		
 	}
 
 	/**
@@ -44,6 +61,8 @@ public class MainForm extends JFrame{
 		JMenuItem exitItem = new JMenuItem("Exit");
 		JMenuItem displayItem = new JMenuItem("Display");
 		JMenuItem addFileItem = new JMenuItem("Add Image");
+		JMenuItem showSearch = new JMenuItem("Search");
+		
 		
 		// Add exit item to file menu
 		exitItem.addActionListener(new ActionListener() {
@@ -60,7 +79,7 @@ public class MainForm extends JFrame{
 		// Add display item to the Record menus
 		displayItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Employee employee =dao.selectFirstEmployee();
+				Employee employee = dao.selectFirstEmployee();
 				
 				// show error if one has occured
 				if (employee == null) {
@@ -68,6 +87,7 @@ public class MainForm extends JFrame{
 				}
 				
 				panel.setEmployee(employee);
+				cardLayout.show(getContentPane(), RECORD_VIEW);
 			}
 		});
 		
@@ -89,8 +109,17 @@ public class MainForm extends JFrame{
 			}
 		});
 		
+		showSearch.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cardLayout.show(getContentPane(), SEARCH_VIEW);
+			}
+		});
+		
 		fileMenu.add(exitItem);
 		recordMenu.add(displayItem);
+		recordMenu.add(showSearch);
 		recordMenu.add(addFileItem);
 		
 		menuBar.add(fileMenu);
