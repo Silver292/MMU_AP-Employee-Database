@@ -12,8 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import uk.tlscott.spike.SearchPanel;
-
 public class MainForm extends JFrame{
 
 	protected EmployeeDAO dao = new EmployeeDAO();

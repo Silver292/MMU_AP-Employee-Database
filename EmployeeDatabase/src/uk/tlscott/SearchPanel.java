@@ -1,4 +1,4 @@
-package uk.tlscott.spike;
+package uk.tlscott;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -15,9 +15,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import uk.tlscott.Employee;
-import uk.tlscott.EmployeeDAO;
-import uk.tlscott.ViewController;
 
 public class SearchPanel extends JPanel{
 	
