@@ -1,4 +1,4 @@
-package uk.tlscott;
+package uk.tlscott.tests;
 import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -7,8 +7,10 @@ import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import uk.tlscott.Employee;
+import uk.tlscott.EmployeeDAO;
 
 public class EmployeeDAOTest {
 
@@ -90,10 +92,7 @@ public class EmployeeDAOTest {
 		Employee emp = db.selectEmployeeById(1);
 		@SuppressWarnings("unused")
 		ArrayList<Employee> employees = db.selectAllEmployees();
-		assertTrue("result set should be closed", db.r.isClosed());
-		assertTrue("statement should be closed", db.s.isClosed());
-		assertTrue("prepared statement should be closed", db.pstmt.isClosed());
-		assertTrue("connection should be closed", db.c.isClosed());
+		assertTrue("connection should be closed", db.isClosed());
 	}
 	
 	@Test

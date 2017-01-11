@@ -17,10 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EmployeeDAO {
-	Connection c;
-	Statement s;
-	PreparedStatement pstmt;
-	ResultSet r;
+	private Connection c;
+	private Statement s;
+	private PreparedStatement pstmt;
+	private ResultSet r;
 	
 	// Logging variables
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
@@ -471,5 +471,15 @@ public class EmployeeDAO {
     		this.closeConnection();
     	}
     	return employees;
+    }
+    
+    public boolean isClosed(){
+    	boolean result = false;
+		try {
+			result = r.isClosed() && c.isClosed() && s.isClosed() && pstmt.isClosed();
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error checking for closed connection", e);
+		} 
+    	return result;
     }
 }
