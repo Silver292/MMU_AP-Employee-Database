@@ -14,6 +14,9 @@ public class DateSpike {
 		
 		LocalDate date = LocalDate.parse(dateString, dateFormat);
 		
+		System.out.println("Day = " + date.getDayOfMonth());
+		System.out.println("Month = " + date.getMonthValue());
+		System.out.println("Year =  " + date.getYear());
 		
 		System.out.println(date);
 		

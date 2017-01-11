@@ -98,8 +98,8 @@ public class EmployeeUpdatePanel extends JPanel{
 				}
 				employee.setEmail(emailTextBox.getText());
 				try {
-					employee.setEmployeeDob(dobDate.getDate());
-					employee.setStartDate(startDate.getDate());
+					employee.setEmployeeDob(dobDate.getDateAsString());
+					employee.setStartDate(startDate.getDateAsString());
 				} catch (UnderMinimumAgeException e1 ) {
 					JOptionPane.showMessageDialog(null, e1.getMessage());
 					return;
