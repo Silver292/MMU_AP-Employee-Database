@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -13,9 +15,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-
 import uk.tlscott.Employee;
 import uk.tlscott.EmployeeDAO;
+import uk.tlscott.ViewController;
 
 public class SearchPanel extends JPanel{
 	
@@ -34,31 +36,34 @@ public class SearchPanel extends JPanel{
 	private JTextField nameField = new JTextField(16);
 	private JTextField idField = new JTextField(16);
 	
-	JTable table = new JTable();
-	EmployeeDAO dao = new EmployeeDAO();
+//TODO	 refactor anonymous jtable?
+	private JTable table = new JTable(){
 
+		private static final long serialVersionUID = 1L;
+		
+		  public boolean isCellEditable(int row, int column) {                
+              return false;               
+      };
+	};
+	
+	private EmployeeDAO dao = new EmployeeDAO();
+	private ArrayList<Employee> searchResults = new ArrayList<Employee>();
+	private ViewController controller;
+	
 	public SearchPanel() {
 		String[] columnNames = {"ID", "Name", "Gender", "DOB", "Address", "Postcode", "National Insurance Number", 
 				"Title", "Start Date", "Salary", "Email" };
 
 		DefaultTableModel tableModel = new DefaultTableModel(null, columnNames);
-
-		ArrayList<Employee> allEmployees = dao.selectAllEmployees();
-
-		for (int i = 0; i < allEmployees.size(); i++) {
-			Employee tempEmp = allEmployees.get(i);
-			tableModel.addRow(new Object[] {tempEmp.getId(), tempEmp.getName(), tempEmp.getGender(), tempEmp.getDob(), tempEmp.getAddress(), 
-					tempEmp.getPostcode(), tempEmp.getNatInscNo(), tempEmp.getTitle(), tempEmp.getStartDate(), tempEmp.getSalary(), tempEmp.getEmail()});
-		}
-
 		table.setModel(tableModel);
 		table.setFillsViewportHeight(true);
 		
+		searchResults = dao.selectAllEmployees();
+		updateTableModel(searchResults);
+		
 		JScrollPane scrollPane = new JScrollPane(table);
 		
-		
 		setLayout(new BorderLayout());
-		
 		JPanel searchPanel = new JPanel(new FlowLayout());
 		
 		searchPanel.add(nameLabel);
@@ -69,26 +74,45 @@ public class SearchPanel extends JPanel{
 		searchPanel.add(searchButton);
 		searchPanel.add(clearButton);
 		
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				if(e.getClickCount() == 2) {
+					
+					if(controller == null) return;
+					
+					int row = table.getSelectedRow();
+					System.out.println(searchResults.get(row));
+					controller.showRecordOf(searchResults.get(row));
+				}
+			}
+		});
+		
 		// search code
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO dao returns and arraylist of employees, need to update table model to show these.
+				String id = idField.getText().trim();
+				String name = nameField.getText().trim();
+				
 				switch (checkFields()) {
 				case BOTH_FIELDS_EMPTY:
-					updateTableModel(dao.selectAllEmployees());
+					searchResults = dao.selectAllEmployees();
+					updateTableModel(searchResults);
 					break;
 					
 				case ONLY_ID_FILLED:
-					updateTableModel(dao.searchByID(idField.getText().trim()));
+					searchResults = dao.searchByID(id);
+					updateTableModel(searchResults);
 					break;
 					
 				case ONLY_NAME_FILLED:
-					updateTableModel(dao.searchByName(nameField.getText().trim()));
+					searchResults = dao.searchByName(name);
+					updateTableModel(searchResults);
 					break;
 					
 				case BOTH_FIELDS_FILLED:
-					updateTableModel(dao.searchByNameAndID(nameField.getText().trim(), idField.getText().trim()));
+					searchResults = dao.searchByNameAndID(name, id);
+					updateTableModel(searchResults);
 					break;
 					
 				default:
@@ -108,9 +132,9 @@ public class SearchPanel extends JPanel{
 		});
 		
 		add(searchPanel, BorderLayout.NORTH);
-		this.add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 	}
-
+	
 	private int checkFields() {
 		if(nameField.getText().trim().isEmpty() && idField.getText().trim().isEmpty()) return BOTH_FIELDS_EMPTY;
 		if(nameField.getText().trim().isEmpty() && !idField.getText().trim().isEmpty()) return ONLY_ID_FILLED;
@@ -120,10 +144,11 @@ public class SearchPanel extends JPanel{
 	
 	private void updateTableModel(ArrayList<Employee> employees) {
 		if (employees == null) return;
-		if (employees.size() == 0) return; // TODO no employee found
 		
 		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 		tableModel.setRowCount(0);
+		
+		if (employees.size() == 0) return; // show empty if no results
 		
 		for (int i = 0; i < employees.size(); i++) {
 			String[] data = new String[11];
@@ -144,5 +169,9 @@ public class SearchPanel extends JPanel{
 		}
 		
 		tableModel.fireTableDataChanged();
+	}
+	
+	public void addViewController(ViewController controller){
+		this.controller = controller;
 	}
 }

@@ -9,21 +9,16 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import uk.tlscott.spike.SearchPanel;
 
 public class MainForm extends JFrame{
 
-	protected static final String RECORD_VIEW = "View.record";
-    protected static final String SEARCH_VIEW = "View.search";
-	
 	protected EmployeeDAO dao = new EmployeeDAO();
-		
-	private CardLayout cardLayout;
-	
-	private EmployeeUpdatePanel panel;
-	private SearchPanel searchPane;
+	private EmployeeUpdatePanel employeePanel;
+	private ViewController controller;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -34,20 +29,31 @@ public class MainForm extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);		// centre frame on screen
 		
-		panel = new EmployeeUpdatePanel(dao);
-		searchPane = new SearchPanel();
+		JPanel pane = new JPanel();
+		setUpController(pane);
 		
-		cardLayout = new CardLayout();
-		setLayout(cardLayout);
-
-		add(panel, RECORD_VIEW);
-		add(searchPane, SEARCH_VIEW);
-		
-		panel.setEmployee(dao.selectFirstEmployee());
-		
-		cardLayout.show(getContentPane(), RECORD_VIEW);
+		add(pane);
 		
 		setUpMenu();
+	}
+
+	/**
+	 * @param pane
+	 */
+	private void setUpController(JPanel pane) {
+		CardLayout cardLayout = new CardLayout();
+		
+		pane.setLayout(cardLayout);
+
+		employeePanel = new EmployeeUpdatePanel(dao);
+		SearchPanel searchPane = new SearchPanel();
+				
+		controller = new ViewController(pane, cardLayout);
+		controller.addView(employeePanel, ViewController.RECORD_VIEW);
+		searchPane.addViewController(controller);
+		controller.addView(searchPane, ViewController.SEARCH_VIEW);
+
+		controller.showRecordOf(dao.selectFirstEmployee());
 	}
 
 	/**
@@ -86,8 +92,7 @@ public class MainForm extends JFrame{
 					JOptionPane.showMessageDialog(null, "There was a getting the first employee", "Database Error", JOptionPane.ERROR_MESSAGE);
 				}
 				
-				panel.setEmployee(employee);
-				cardLayout.show(getContentPane(), RECORD_VIEW);
+				controller.showRecordOf(employee);
 			}
 		});
 		
@@ -104,7 +109,7 @@ public class MainForm extends JFrame{
 				int returnVal = chooser.showOpenDialog(null);
 				
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					panel.setImage(chooser.getSelectedFile());
+					employeePanel.setImage(chooser.getSelectedFile());
 				}
 			}
 		});
@@ -113,19 +118,18 @@ public class MainForm extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				cardLayout.show(getContentPane(), SEARCH_VIEW);
+				controller.showSearchView();
 			}
 		});
 		
 		fileMenu.add(exitItem);
+		
 		recordMenu.add(displayItem);
 		recordMenu.add(showSearch);
 		recordMenu.add(addFileItem);
 		
 		menuBar.add(fileMenu);
 		menuBar.add(recordMenu);
-		
-		
 		
 		setJMenuBar(menuBar);
 	}
