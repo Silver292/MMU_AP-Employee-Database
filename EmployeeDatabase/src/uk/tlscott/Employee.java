@@ -32,19 +32,13 @@ public class Employee extends Person {
 	 * @throws StartWorkDateException
 	 */
 	public void setEmployeeDob(String dob) throws UnderMinimumAgeException {
-		// if null set to null
-		if (dob == null){
-			this.dob = null;
-			return;
+		if (dob != null){
+			LocalDate date = LocalDate.parse(dob, dateFormat);
+			if(underWorkingAge(date, getStartDate())) {
+				throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
+			}
 		}
-
-		LocalDate date = LocalDate.parse(dob, dateFormat);
-
-		// check over minimum working age
-		if(underWorkingAge(date, getStartDate())) {
-			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
-		}
-
+		
 		super.setDob(dob);
 	}
 
@@ -63,7 +57,6 @@ public class Employee extends Person {
 	public void setId(String id) {
 		this.id = id;
 	}
-
 
 	/**
 	 * @return the id
@@ -95,14 +88,12 @@ public class Employee extends Person {
 	 * @throws UnderMinimumAgeException 
 	 */
 	public void setStartDate(String startDate) throws UnderMinimumAgeException {
-		if(startDate == null){
+		if(startDate != null){
 			this.startDate = null;
 			return;
 		}
 
 		LocalDate date = LocalDate.parse(startDate, dateFormat);
-
-		// check over minimum working age
 		if(underWorkingAge(getDob(), date)) {
 			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
 		}
