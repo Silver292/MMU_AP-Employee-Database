@@ -33,7 +33,6 @@ public class EmployeeRecordPanel extends JPanel{
     private JButton backButton    = new JButton("Back");
     private JButton forwardButton = new JButton("Forward");
     
-    
     private JLabel titleLabel     = new JLabel("Enter Employee Information");
     private JLabel nameLabel      = new JLabel("Employee Name");                
     private JLabel genderLabel    = new JLabel("Employee Gender");            
@@ -67,168 +66,10 @@ public class EmployeeRecordPanel extends JPanel{
 	
 	public EmployeeRecordPanel(EmployeeDAO dao) {
 		this.dao = dao;
-		
 		setFonts();
-		
 		setLayout(new GridBagLayout());
 		addComponents();
-		
-		/*
-		 * Action Listeners
-		 */
-		
-		// Update employee fields
-		enterButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// check for empty fields and return if user cancels
-				if(!checkForEmptyFields())
-					return;
-					
-				// set gender
-				char gender =  maleRadio.isSelected() ? 'M' : 'F';
-				employee.setGender(gender);
-				
-				employee.setName(nameTextBox.getText());
-				employee.setSalary(salaryTextBox.getText());
-				try {
-					employee.setNatInscNo(ninTextBox.getText());
-				} catch (InvalidNationalInsuranceException e2) {
-					JOptionPane.showMessageDialog(null, e2.getMessage());
-					return;
-				}
-				employee.setEmail(emailTextBox.getText());
-				try {
-					employee.setEmployeeDob(dobDate.getDateAsString());
-					employee.setStartDate(startDate.getDateAsString());
-				} catch (UnderMinimumAgeException e1 ) {
-					JOptionPane.showMessageDialog(null, e1.getMessage());
-					return;
-				} 
-				employee.setTitle(jobTitleTextBox.getText());
-				
-				// check if employee has an id, if not create new employee
-				if(employee.getId() == null) {
-					if (dao.insertEmployee(employee) != -1) {
-						JOptionPane.showMessageDialog(null, "There was a problem creating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
-					}
-					return;
-				}
-				
-				// update existing employee and check for success
-				boolean success = dao.updateEmployee(employee);
-				if (!success) {
-					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-		});
-		
-		// Clear form
-		clearButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				clearFields();
-			}
-		});
-		
-		// Next employee
-		forwardButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// if employee is null (clear button has been pressed) return first employee
-				if(employee.getId() == null) {
-					employee = dao.selectFirstEmployee();
-				} else {
-					// get next employee from the database
-					employee = dao.getNextEmployee(employee.getId());
-				}
-				
-				// show error if one has occured
-				if (employee == null) {
-					JOptionPane.showMessageDialog(null, "There was a getting the next employee", "Database Error", JOptionPane.ERROR_MESSAGE);
-				}
-				
-				// update fields
-				setEmployee(employee);
-			}
-		});
-		
-		// Back button
-		backButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(employee.getId() == null) {
-					employee = dao.selectFirstEmployee();
-				} else {
-					// get next employee from the database
-					employee = dao.getPreviousEmployee(employee.getId());
-				}
-				
-				// show error if one has occured
-				if (employee == null) {
-					JOptionPane.showMessageDialog(null, "There was a getting the previous employee", "Database Error", JOptionPane.ERROR_MESSAGE);
-				}
-				
-				// update fields
-				setEmployee(employee);
-			}
-		});
-	}
-	
-	/**
-	 * Checks for empty fields in the form.
-	 * <br>
-	 * Creates JOptionPane to inform user that fields are empty.
-	 * <br>
-	 * If all fields are filled will return true.
-	 *<br> 
-	 * If there are any empty fields the user is informed using a {@link javax.swing.JOptionPane#showConfirmDialog confirm dialog}
-	 * if the user chooses to proceed with empty fields method will return true otherwise will return false. 
-	 * 
-	 * @return boolean true if all fields are filled or the user wants to proceed with empty fields, false if otherwise.
-	 */
-	private boolean checkForEmptyFields() {
-		ArrayList<String> emptyFieldList = new ArrayList<String>();
-		
-		// add empty fields to list
-		if(nameTextBox.getText().trim().isEmpty()) emptyFieldList.add("name");
-		if(salaryTextBox.getText().trim().isEmpty()) emptyFieldList.add("salary");
-		if(ninTextBox.getText().trim().isEmpty()) emptyFieldList.add("national insurance");
-		if(emailTextBox.getText().trim().isEmpty()) emptyFieldList.add("email");
-		if(jobTitleTextBox.getText().trim().isEmpty()) emptyFieldList.add("job title");
-		
-		//TODO: Should we warn if there is no image?
-		
-		// return if all are filled
-		if(emptyFieldList.isEmpty()) return true;
-		
-		// create error message
-		String emptyFields = "";
-
-		// add empty field to string comma seperated
-		int listSize = emptyFieldList.size();
-		for (int i = 0; i < listSize; i++) {
-			emptyFields += emptyFieldList.get(i);
-			
-			if (i < listSize - 1)
-				emptyFields += ", ";
-		}
-		
-		// create formatted error message
-		String emptyFieldsMessage = String.format("The %s %s %s empty. Continue?", 
-				listSize > 1 ? "fields" : "field", 
-				emptyFields, 
-				listSize > 1 ? "are" : "is");
-		
-		// show dialog and get user response
-		int userResponse = JOptionPane.showConfirmDialog(null, emptyFieldsMessage);
-		
-		// if user clicks yes
-		if(userResponse == JOptionPane.YES_OPTION) return true;
-		
-		// if user clicks 'No', 'Cancel' or closes the dialog 
-		return false;
-		
+		addActionListeners();
 	}
 
 	/**
@@ -259,66 +100,6 @@ public class EmployeeRecordPanel extends JPanel{
 	}
 
 	/**
-	 * Sets the fields to the employees details.
-	 * 
-	 * @param emp employee to set details to.
-	 */
-	public void setEmployee(Employee emp) {
-		if(emp == null) {
-			clearFields();
-			return;
-		} 
-		
-		this.employee = emp;
-		setFields();
-	}
-
-	/**
-	 * Sets text fields in form using details from employee.
-	 * 
-	 * @param emp
-	 */
-	private void setFields() {
-		nameTextBox.setText(employee.getName());
-		// set gender radio button
-		if (employee.getGender() == 'M') maleRadio.setSelected(true);
-		else femaleRadio.setSelected(true);
-	
-		dobDate.setDate(employee.getDob());
-		salaryTextBox.setText(employee.getSalary());
-		ninTextBox.setText(employee.getNatInscNo());
-		emailTextBox.setText(employee.getEmail());
-		startDate.setDate(employee.getStartDate());
-		jobTitleTextBox.setText(employee.getTitle());
-		empIdLabel.setText(employee.getId());
-		
-		if (employee.hasImage()) {
-			imageLabel.setImage(employee.getImageFile());
-		} else {
-			imageLabel.setDefaultImage();
-		}
-		
-	}
-	
-	/**
-	 * Clears fields.
-	 */
-	private void clearFields() {
-		employee = new Employee();
-		String empty = "";
-		nameTextBox.setText(empty);
-		maleRadio.setSelected(true);
-		dobDate.setDate(null);
-		salaryTextBox.setText(empty);
-		ninTextBox.setText(empty);
-		emailTextBox.setText(empty);
-		startDate.setDate(null);
-		jobTitleTextBox.setText(empty);
-		empIdLabel.setText(empty);
-		imageLabel.setDefaultImage();
-	}
-	
-	/**
 	 * Adds components to panel.
 	 */
 	private void addComponents() {
@@ -334,7 +115,7 @@ public class EmployeeRecordPanel extends JPanel{
 		int leftAlign = GridBagConstraints.LINE_START;
 		int centerAlign = GridBagConstraints.CENTER;
 		int fillHorizontal = GridBagConstraints.HORIZONTAL;
-
+	
 		/*
 		 * Column one
 		 */
@@ -346,7 +127,7 @@ public class EmployeeRecordPanel extends JPanel{
 		c.gridwidth = 3;
 		c.anchor = GridBagConstraints.NORTH;
 		add(titleLabel, c);
-
+	
 		// add column one members
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -373,20 +154,20 @@ public class EmployeeRecordPanel extends JPanel{
 		c.fill = noAnchor;
 		c.anchor = leftAlign;
 		add(nameTextBox, c);
-
+	
 		// adds radio buttons
 		c.gridy++;
 		add(maleRadio, c);
 		c.anchor = GridBagConstraints.LINE_END;
 		add(femaleRadio, c); 
-
+	
 		// add d.o.b date picker
 		c.gridy++;
 		c.anchor = leftAlign;
 		c.fill = fillHorizontal;
 		c.ipady = 0;
 		add(dobDate, c);
-
+	
 		// add column two members
 		c.ipady = 10;
 		c.gridy++;
@@ -457,6 +238,237 @@ public class EmployeeRecordPanel extends JPanel{
 		genderGroup.add(femaleRadio);
 	}
 
+	private void addActionListeners() {
+		addEnterActionListener();
+		addClearActionListener();
+		addForwardButtonActionListener();
+		addBackButtonActionListener();
+	}
+
+	private void addEnterActionListener() {
+		enterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// check for empty fields and return if user cancels
+				if(!checkForEmptyFields())
+					return;
+					
+				try {
+					fillEmployeeDetails();
+				} catch (InvalidNationalInsuranceException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage());
+					return;
+				} catch (UnderMinimumAgeException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage());
+					return;
+				}
+				
+				boolean employeeInDatabase = employee.getId() != null;
+				if(employeeInDatabase) {
+					updateEmployee(dao);
+				} else {
+					addNewEmployee(dao);
+				}
+			}
+	
+			/**
+			 * Checks for empty fields in the form.
+			 * <br>
+			 * Creates JOptionPane to inform user that fields are empty.
+			 * <br>
+			 * If all fields are filled will return true.
+			 *<br> 
+			 * If there are any empty fields the user is informed using a {@link javax.swing.JOptionPane#showConfirmDialog confirm dialog}
+			 * if the user chooses to proceed with empty fields method will return true otherwise will return false. 
+			 * 
+			 * @return boolean true if all fields are filled or the user wants to proceed with empty fields, false if otherwise.
+			 */
+			private boolean checkForEmptyFields() {
+				ArrayList<String> emptyFieldList = new ArrayList<String>();
+				
+				addFieldsIfEmpty(emptyFieldList);
+				
+				if(emptyFieldList.isEmpty()) {
+					return true;
+				} else {
+					return usersResponse(emptyFieldList);
+				}
+			}
+
+			private boolean usersResponse(ArrayList<String> emptyFieldList) {
+				String emptyFieldsMessage = createMessage(emptyFieldList);
+				
+				int userResponse = JOptionPane.showConfirmDialog(null, emptyFieldsMessage);
+				
+				if(userResponse == JOptionPane.YES_OPTION) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			private String createMessage(ArrayList<String> emptyFieldList) {
+				String emptyFields = "";
+			
+				// add empty field to string comma separated
+				int listSize = emptyFieldList.size();
+				for (int i = 0; i < listSize; i++) {
+					emptyFields += emptyFieldList.get(i);
+					
+					if (i < listSize - 1)
+						emptyFields += ", ";
+				}
+				
+				// create formatted error message
+				String emptyFieldsMessage = String.format("The %s %s %s empty. Continue?", 
+						listSize > 1 ? "fields" : "field", 
+						emptyFields, 
+						listSize > 1 ? "are" : "is");
+				return emptyFieldsMessage;
+			}
+
+			private void addFieldsIfEmpty(ArrayList<String> emptyFieldList) {
+				if(nameTextBox.getText().trim().isEmpty()) emptyFieldList.add("name");
+				if(salaryTextBox.getText().trim().isEmpty()) emptyFieldList.add("salary");
+				if(ninTextBox.getText().trim().isEmpty()) emptyFieldList.add("national insurance");
+				if(emailTextBox.getText().trim().isEmpty()) emptyFieldList.add("email");
+				if(jobTitleTextBox.getText().trim().isEmpty()) emptyFieldList.add("job title");
+			}
+
+			private void fillEmployeeDetails() throws InvalidNationalInsuranceException,
+			UnderMinimumAgeException {
+				char gender =  maleRadio.isSelected() ? 'M' : 'F';
+				employee.setGender(gender);
+				employee.setName(nameTextBox.getText());
+				employee.setSalary(salaryTextBox.getText());
+				employee.setNatInscNo(ninTextBox.getText());
+				employee.setEmail(emailTextBox.getText());
+				employee.setEmployeeDob(dobDate.getDateAsString());
+				employee.setStartDate(startDate.getDateAsString());
+				employee.setTitle(jobTitleTextBox.getText());
+			}
+
+			private void addNewEmployee(EmployeeDAO dao) {
+				int generatedID = dao.insertEmployee(employee);
+				if (generatedID == -1) {
+					JOptionPane.showMessageDialog(null, "There was a problem creating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
+				}
+				employee.setId(String.valueOf(generatedID));
+			}
+	
+			private void updateEmployee(EmployeeDAO dao) {
+				boolean updateSuccessful = dao.updateEmployee(employee);
+				if (!updateSuccessful) {
+					JOptionPane.showMessageDialog(null, "There was a problem updating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+	
+		});
+	}
+
+	private void addClearActionListener() {
+		clearButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clearFields();
+			}
+		});
+	}
+
+	private void addForwardButtonActionListener() {
+		forwardButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// if employee is null (clear button has been pressed) return first employee
+				changeEmployee("next");
+			}
+		});
+	}
+
+	private void addBackButtonActionListener() {
+		backButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeEmployee("previous");
+			}
+		});
+	}
+
+	private void changeEmployee(String direction) {
+		if(employee.getId() == null) {
+			employee = dao.selectFirstEmployee();
+		} else {
+			employee = direction.equals("next") ? 
+					dao.getNextEmployee(employee.getId()) : dao.getPreviousEmployee(employee.getId());
+		}
+		
+		if (employee == null) {
+			String message = String.format("There was a getting the %s employee", direction);
+			JOptionPane.showMessageDialog(null, message, "Database Error", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		setEmployee(employee);
+	}
+
+	/**
+	 * Sets the fields to the employees details.
+	 * 
+	 * @param emp employee to set details to.
+	 */
+	public void setEmployee(Employee emp) {
+		if(emp == null) {
+			clearFields();
+			return;
+		} 
+		
+		this.employee = emp;
+		setFields();
+	}
+
+	/**
+	 * Sets text fields in form using details from employee.
+	 * 
+	 * @param emp
+	 */
+	private void setFields() {
+		nameTextBox.setText(employee.getName());
+		// set gender radio button
+		if (employee.getGender() == 'M') maleRadio.setSelected(true);
+		else femaleRadio.setSelected(true);
+	
+		dobDate.setDate(employee.getDob());
+		salaryTextBox.setText(employee.getSalary());
+		ninTextBox.setText(employee.getNatInscNo());
+		emailTextBox.setText(employee.getEmail());
+		startDate.setDate(employee.getStartDate());
+		jobTitleTextBox.setText(employee.getTitle());
+		empIdLabel.setText(employee.getId());
+		
+		if (employee.hasImage()) {
+			imageLabel.setImage(employee.getImageFile());
+		} else {
+			imageLabel.setDefaultImage();
+		}
+		
+	}
+	
+	/**
+	 * Clears fields.
+	 */
+	private void clearFields() {
+		employee = new Employee();
+		String empty = "";
+		nameTextBox.setText(empty);
+		maleRadio.setSelected(true);
+		dobDate.setDate(null);
+		salaryTextBox.setText(empty);
+		ninTextBox.setText(empty);
+		emailTextBox.setText(empty);
+		startDate.setDate(null);
+		jobTitleTextBox.setText(empty);
+		empIdLabel.setText(empty);
+		imageLabel.setDefaultImage();
+	}
+	
 	/**
 	 * Sets employee image, shows image in pane.
 	 * @param file image file to display
