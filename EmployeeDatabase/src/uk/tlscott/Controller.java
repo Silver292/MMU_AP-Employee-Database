@@ -4,6 +4,8 @@ import java.util.ArrayList;
 public class Controller {
 
     public static void main(String[] args) {
+		org.junit.runner.JUnitCore.main("uk.tlscott.tests.AllTests");
+    	
         // Create database object
         EmployeeDAO db = new EmployeeDAO();
         Employee emp = new Employee();
