@@ -1,48 +1,79 @@
 package uk.tlscott;
 
-import java.awt.Image;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-public class ImagePane extends JLabel{
+public class ImagePanel extends JPanel{
 	private static final long serialVersionUID = 1L;
-	private Icon defaultImage;
-
+	private static final String DEFAULT_IMAGE_PATH = "assets/default.png";
+	private static final int DEFAULT_WIDTH = 250;
+	private static final int DEFAULT_HEIGHT = 250;
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-
 	
-	public ImagePane() {
+	private BufferedImage image;
+	private BufferedImage defaultImage;
+	
+	public ImagePanel() {
 		super();
-		// set default image
+		Dimension size = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		setPreferredSize(size);
+		setMinimumSize(size);
 		try {
-			defaultImage = new ImageIcon(ImageIO.read(new File("assets/default.png")));
+			image = ImageIO.read(new File(DEFAULT_IMAGE_PATH));
+			defaultImage = image;
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Default image failed to load", e);
 		}
 	}
 	
 	public void setImage(File file) {
-		
-		try {
-			// get image from file
-			Image image = ImageIO.read(file);
-			image = image.getScaledInstance(250, 250, Image.SCALE_DEFAULT);
-			this.setIcon(new ImageIcon(image));
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Image failed to load", e);
-			JOptionPane.showMessageDialog(null, "Error loading image", "Image Error", JOptionPane.ERROR_MESSAGE);
+		if(file == null) {
+			image = defaultImage;
+		} else {
+			try {
+				image = ImageIO.read(file);
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "Image failed to load", e);
+				JOptionPane.showMessageDialog(null, "Error loading image", "Image Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
 	public void setDefaultImage() {
-		this.setIcon(this.defaultImage);
+		image = defaultImage;
+		repaint();
+	}
+	
+	public void paintComponent(Graphics g)
+	{
+		g.drawImage(image, 0, 0, null);
+	}
+
+	
+	public void setResizedImage(File file) {
+		setImage(file);
+		image = resizeImage(image);
+		repaint();
+	}
+
+	private BufferedImage resizeImage(BufferedImage image) {
+		int type = BufferedImage.TYPE_INT_ARGB;
+		
+		BufferedImage resizedImage = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, type);
+		Graphics2D g = resizedImage.createGraphics();
+		g.drawImage(image, 0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, this);
+		g.dispose();
+		
+		return resizedImage;
 	}
 }
