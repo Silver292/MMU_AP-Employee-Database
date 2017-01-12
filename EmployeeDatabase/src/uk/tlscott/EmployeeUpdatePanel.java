@@ -108,7 +108,7 @@ public class EmployeeUpdatePanel extends JPanel{
 				
 				// check if employee has an id, if not create new employee
 				if(employee.getId() == null) {
-					if (dao.insertEmployee(employee) != 0) {
+					if (dao.insertEmployee(employee) != -1) {
 						JOptionPane.showMessageDialog(null, "There was a problem creating the employee record", "Database Error", JOptionPane.ERROR_MESSAGE);
 					}
 					return;

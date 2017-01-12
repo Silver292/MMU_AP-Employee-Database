@@ -38,31 +38,9 @@ public class EmployeeDAO {
 		return c;
 	}
 	
-	public void closeConnection() {
-		closeQuietly(r);
-		closeQuietly(s);
-		closeQuietly(pstmt);
-		closeQuietly(c);
-	}
-	
-	/**
-	 * Closes an <code>AutoClosable</code> unequivocally.
-	 * <br>
-	 * Equivalent to {@link java.lang.AutoClosable#close() AutoClosable.close()}, except any exceptions will be ignored
-	 * @param input -  the object to close, may be null or already closed
-	 */
-	public void closeQuietly(AutoCloseable input) {
-		try {
-			if (input != null) {
-				input.close();
-			}
-		} catch (Exception e) {
-			// ignored
-		}
-	}
 	// returns generated id
 	public int insertEmployee(Employee emp) {
-		int generatedKey = 0;
+		int generatedKey = -1;
 	
 		String sql = "INSERT INTO employees "
 				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
@@ -83,6 +61,70 @@ public class EmployeeDAO {
 			this.closeConnection();
 		}
 		return generatedKey;
+	}
+
+	/**
+	 * @param emp
+	 * @throws SQLException
+	 */
+	private void setPreparedStatement(Employee emp) throws SQLException {
+		pstmt.setString(1, emp.getName());
+		pstmt.setString(2, String.valueOf(emp.getGender()));
+		pstmt.setString(3, emp.getDob().toString());
+		pstmt.setString(4, emp.getAddress());
+		pstmt.setString(5, emp.getPostcode());
+		pstmt.setString(6, emp.getNatInscNo());
+		pstmt.setString(7, emp.getTitle());
+		pstmt.setString(8, emp.getStartDate().toString());
+		pstmt.setString(9, emp.getSalary());
+		pstmt.setString(10, emp.getEmail());
+	    pstmt.setBytes(11, readFile(emp.getImageFile()));
+	}
+
+	/**
+	 * Read the file and returns the byte array
+	 * @param file
+	 * @return the bytes of the file
+	 */
+	private byte[] readFile(File file) {
+		if (file == null) return null;
+		
+	    ByteArrayOutputStream bos = null;
+	    try ( FileInputStream fis = new FileInputStream(file)){
+	        byte[] buffer = new byte[1024];
+	        bos = new ByteArrayOutputStream();
+	        for (int len; (len = fis.read(buffer)) != -1;) {
+	            bos.write(buffer, 0, len);
+	        }
+	    } catch (FileNotFoundException e) {
+	        LOGGER.log(Level.WARNING, "Error reading image file", e);
+	    } catch (IOException e) {
+	        LOGGER.log(Level.WARNING, "Error reading image file", e);
+	    }
+	    return bos != null ? bos.toByteArray() : null;
+	}
+
+	public void closeConnection() {
+		closeQuietly(r);
+		closeQuietly(s);
+		closeQuietly(pstmt);
+		closeQuietly(c);
+	}
+
+	/**
+	 * Closes an <code>AutoClosable</code> unequivocally.
+	 * <br>
+	 * Equivalent to {@link java.lang.AutoClosable#close() AutoClosable.close()}, except any exceptions will be ignored
+	 * @param input -  the object to close, may be null or already closed
+	 */
+	public void closeQuietly(AutoCloseable input) {
+		try {
+			if (input != null) {
+				input.close();
+			}
+		} catch (Exception e) {
+			// ignored
+		}
 	}
 
 	public boolean updateEmployee(Employee emp) {
@@ -244,6 +286,59 @@ public class EmployeeDAO {
 	}
 
 	/**
+	 * @return
+	 * @throws SQLException
+	 */
+	private Employee setEmployeeFields() throws SQLException {
+		Employee emp = new Employee();
+		emp.setId(Integer.toString(r.getInt("ID")));
+		emp.setName(r.getString("Name"));
+		emp.setGender(r.getString("Gender").charAt(0));
+		emp.setDob(r.getString("DOB"));
+		emp.setAddress(r.getString("Address"));
+		emp.setPostcode(r.getString("Postcode"));
+		emp.setTitle(r.getString("JobTitle"));
+		emp.setSalary(r.getString("Salary"));
+		emp.setEmail(r.getString("Email"));
+		emp.setImage(getImageFile(emp));
+		try {
+			emp.setNatInscNo(r.getString("NIN"));
+		} catch (InvalidNationalInsuranceException e1) {
+			LOGGER.log(Level.INFO, e1.getMessage(), e1);
+		}
+		try {
+			emp.setStartDate(r.getString("StartDate"));
+		} catch (UnderMinimumAgeException e) {
+			LOGGER.log(Level.INFO, e.getMessage(), e);
+		}
+		return emp;
+	}
+
+	/**
+	 * @param emp
+	 * @throws SQLException
+	 */
+	private File getImageFile(Employee emp) throws SQLException {
+		File file = new File("./assets/empImage" + emp.getId() + ".jpg");
+		
+		try (FileOutputStream fos = new FileOutputStream(file)){
+			InputStream input = r.getBinaryStream("Image");
+			if(input != null) {
+				// write to file from database
+				byte[] buffer = new byte[1024];
+				while (input.read(buffer) > 0) {
+					fos.write(buffer);
+				}
+				return file;
+			} 
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "Error creating tempory image file", e);
+		}
+	
+		return null;
+	}
+
+	/**
 	 * Selects previous employee in table based on employee id.
 	 * <br>
 	 * If at the beginning of the table will wrap around and return the last employee in the table.
@@ -308,101 +403,7 @@ public class EmployeeDAO {
 		
 	}
 	
-/**
-	 * @return
-	 * @throws SQLException
-	 */
-	private Employee setEmployeeFields() throws SQLException {
-		Employee emp = new Employee();
-		emp.setId(Integer.toString(r.getInt("ID")));
-		emp.setName(r.getString("Name"));
-		emp.setGender(r.getString("Gender").charAt(0));
-		emp.setDob(r.getString("DOB"));
-		emp.setAddress(r.getString("Address"));
-		emp.setPostcode(r.getString("Postcode"));
-		emp.setTitle(r.getString("JobTitle"));
-		emp.setSalary(r.getString("Salary"));
-		emp.setEmail(r.getString("Email"));
-		emp.setImage(getImageFile(emp));
-		try {
-			emp.setNatInscNo(r.getString("NIN"));
-		} catch (InvalidNationalInsuranceException e1) {
-			LOGGER.log(Level.INFO, e1.getMessage(), e1);
-		}
-		try {
-			emp.setStartDate(r.getString("StartDate"));
-		} catch (UnderMinimumAgeException e) {
-			LOGGER.log(Level.INFO, e.getMessage(), e);
-		}
-		return emp;
-	}
-
-	/**
-	 * @param emp
-	 * @throws SQLException
-	 */
-	private void setPreparedStatement(Employee emp) throws SQLException {
-		pstmt.setString(1, emp.getName());
-		pstmt.setString(2, String.valueOf(emp.getGender()));
-		pstmt.setString(3, emp.getDob().toString());
-		pstmt.setString(4, emp.getAddress());
-		pstmt.setString(5, emp.getPostcode());
-		pstmt.setString(6, emp.getNatInscNo());
-		pstmt.setString(7, emp.getTitle());
-		pstmt.setString(8, emp.getStartDate().toString());
-		pstmt.setString(9, emp.getSalary());
-		pstmt.setString(10, emp.getEmail());
-        pstmt.setBytes(11, readFile(emp.getImageFile()));
-	}
-
-	/**
-	 * @param emp
-	 * @throws SQLException
-	 */
-	private File getImageFile(Employee emp) throws SQLException {
-		File file = new File("./assets/empImage" + emp.getId() + ".jpg");
-		
-		try (FileOutputStream fos = new FileOutputStream(file)){
-			InputStream input = r.getBinaryStream("Image");
-			if(input != null) {
-				// write to file from database
-				byte[] buffer = new byte[1024];
-				while (input.read(buffer) > 0) {
-					fos.write(buffer);
-				}
-				return file;
-			} 
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Error creating tempory image file", e);
-		}
-	
-		return null;
-	}
-
-	/**
-     * Read the file and returns the byte array
-     * @param file
-     * @return the bytes of the file
-     */
-    private byte[] readFile(File file) {
-    	if (file == null) return null;
-    	
-        ByteArrayOutputStream bos = null;
-        try ( FileInputStream fis = new FileInputStream(file)){
-            byte[] buffer = new byte[1024];
-            bos = new ByteArrayOutputStream();
-            for (int len; (len = fis.read(buffer)) != -1;) {
-                bos.write(buffer, 0, len);
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.log(Level.WARNING, "Error reading image file", e);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error reading image file", e);
-        }
-        return bos != null ? bos.toByteArray() : null;
-    }
-
-    public ArrayList<Employee> searchByID(String id) {
+public ArrayList<Employee> searchByID(String id) {
     	ArrayList<Employee> employees = new ArrayList<Employee>();
     	id = String.format("%%%s%%", id);
     	String sql = "SELECT * FROM employees WHERE ID LIKE ?;";
@@ -474,12 +475,12 @@ public class EmployeeDAO {
     }
     
     public boolean isClosed(){
-    	boolean result = false;
+    	boolean allClosed = false;
 		try {
-			result = r.isClosed() && c.isClosed() && s.isClosed() && pstmt.isClosed();
+			allClosed = r.isClosed() && c.isClosed() && s.isClosed() && pstmt.isClosed();
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error checking for closed connection", e);
 		} 
-    	return result;
+    	return allClosed;
     }
 }
