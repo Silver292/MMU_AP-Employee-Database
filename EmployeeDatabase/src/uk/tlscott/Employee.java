@@ -157,10 +157,6 @@ public class Employee extends Person {
 		return this.imageFile;
 	}
 
-	public boolean hasImage() {
-		return this.imageFile != null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

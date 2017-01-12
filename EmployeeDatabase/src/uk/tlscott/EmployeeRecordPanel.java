@@ -9,11 +9,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -26,7 +22,7 @@ import javax.swing.JTextField;
 public class EmployeeRecordPanel extends JPanel{
 	private static final long serialVersionUID = -5570407357068482978L;
 	
-    private ImagePane imageLabel = new ImagePane();
+    private ImagePanel imagePanel = new ImagePanel();
     
     private JButton enterButton   = new JButton("Enter");
     private JButton clearButton   = new JButton("Clear");
@@ -61,8 +57,6 @@ public class EmployeeRecordPanel extends JPanel{
 
 	private Employee employee;
 	private EmployeeDAO dao;
-	
-	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
 	
 	public EmployeeRecordPanel(EmployeeDAO dao) {
 		this.dao = dao;
@@ -217,7 +211,7 @@ public class EmployeeRecordPanel extends JPanel{
 		c.insets = defaultInsets;
 		c.gridy++;
 		c.gridheight = imageHeight;
-		add(imageLabel, c);
+		add(imagePanel, c);
 		
 		// adds back button
 		c.ipadx = 60;
@@ -442,13 +436,7 @@ public class EmployeeRecordPanel extends JPanel{
 		startDate.setDate(employee.getStartDate());
 		jobTitleTextBox.setText(employee.getTitle());
 		empIdLabel.setText(employee.getId());
-		
-		if (employee.hasImage()) {
-			imageLabel.setImage(employee.getImageFile());
-		} else {
-			imageLabel.setDefaultImage();
-		}
-		
+		imagePanel.setResizedImage(employee.getImageFile());
 	}
 	
 	/**
@@ -466,7 +454,7 @@ public class EmployeeRecordPanel extends JPanel{
 		startDate.setDate(null);
 		jobTitleTextBox.setText(empty);
 		empIdLabel.setText(empty);
-		imageLabel.setDefaultImage();
+		imagePanel.setDefaultImage();
 	}
 	
 	/**
@@ -474,26 +462,7 @@ public class EmployeeRecordPanel extends JPanel{
 	 * @param file image file to display
 	 */
 	public void setImage(File file) {
-		String fileType = "Unknown";
-		
-		// get file extension
-		try {
-			fileType = Files.probeContentType(file.toPath());
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Error identifying file extension", e);
-		}
-		
-		// check for valid type
-		boolean isValidFileType = fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/gif");
-		if (isValidFileType) {
-			employee.setImage(file);
-
-			// update pane
-			setFields();
-		} else {
-			// show error message
-			JOptionPane.showMessageDialog(null, "Could not load image, invalid file type", "Image Error", JOptionPane.ERROR_MESSAGE);
-		}
-		
+		imagePanel.setResizedImage(file);
+		employee.setImage(file);
 	}
 }
