@@ -28,7 +28,7 @@ public  class ViewController {
 	
 	public void showRecordOf(Employee emp) {
 		showView(RECORD_VIEW);
-		EmployeeUpdatePanel panel = (EmployeeUpdatePanel)mapNames.get(RECORD_VIEW);
+		EmployeeRecordPanel panel = (EmployeeRecordPanel)mapNames.get(RECORD_VIEW);
 		panel.setEmployee(emp);
 	}
 	

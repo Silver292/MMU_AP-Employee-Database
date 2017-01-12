@@ -15,7 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class MainForm extends JFrame{
 
 	protected EmployeeDAO dao = new EmployeeDAO();
-	private EmployeeUpdatePanel employeePanel;
+	private EmployeeRecordPanel employeePanel;
 	private ViewController controller;
 	
 	private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public class MainForm extends JFrame{
 		
 		pane.setLayout(cardLayout);
 
-		employeePanel = new EmployeeUpdatePanel(dao);
+		employeePanel = new EmployeeRecordPanel(dao);
 		SearchPanel searchPane = new SearchPanel();
 				
 		controller = new ViewController(pane, cardLayout);

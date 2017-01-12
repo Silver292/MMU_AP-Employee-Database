@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-public class EmployeeUpdatePanel extends JPanel{
+public class EmployeeRecordPanel extends JPanel{
 	private static final long serialVersionUID = -5570407357068482978L;
 	
     private ImagePane imageLabel = new ImagePane();
@@ -65,7 +65,7 @@ public class EmployeeUpdatePanel extends JPanel{
 	
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
 	
-	public EmployeeUpdatePanel(EmployeeDAO dao) {
+	public EmployeeRecordPanel(EmployeeDAO dao) {
 		this.dao = dao;
 		
 		setFonts();
