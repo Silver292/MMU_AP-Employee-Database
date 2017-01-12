@@ -98,17 +98,26 @@ public class MainForm extends JFrame{
 		addFileItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// set up file chooser
-				JFileChooser chooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
-				chooser.setFileFilter(filter);
-				chooser.setDialogTitle("Add Image");
 				
-				int returnVal = chooser.showOpenDialog(null);
-				
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					employeePanel.setImage(chooser.getSelectedFile());
+				//only add images on employee panel
+				if(employeePanel.isVisible()) {
+
+					// set up file chooser
+					JFileChooser chooser = new JFileChooser();
+					FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
+					chooser.setFileFilter(filter);
+					chooser.setDialogTitle("Add Image");
+
+					int returnVal = chooser.showOpenDialog(null);
+
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						employeePanel.setImage(chooser.getSelectedFile());
+					}
+
+				} else {
+					JOptionPane.showMessageDialog(null, "To add image to employee go to Record -> Display", "Image Error", JOptionPane.ERROR_MESSAGE);
 				}
+				
 			}
 		});
 		
