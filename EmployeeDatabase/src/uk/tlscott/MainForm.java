@@ -106,6 +106,7 @@ public class MainForm extends JFrame{
 					JFileChooser chooser = new JFileChooser();
 					FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
 					chooser.setFileFilter(filter);
+					chooser.setAcceptAllFileFilterUsed(false);
 					chooser.setDialogTitle("Add Image");
 
 					int returnVal = chooser.showOpenDialog(null);
