@@ -57,18 +57,12 @@ public class Person {
 	 * @throws InvalidNationalInsuranceException if passed an invalid NIN.
 	 */
 	public void setNatInscNo(String natInscNo) throws InvalidNationalInsuranceException{
-		boolean nullOrEmpty = natInscNo == null || natInscNo.equals("");
-		if (nullOrEmpty) {
-			this.natInscNo = natInscNo;
-			return;
+		boolean hasText = natInscNo != null && !natInscNo.isEmpty();
+		if (hasText) {
+			natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
+			validateNIN(natInscNo);
 		}
-		
-		boolean validNatInscNo = validateNIN(natInscNo);
-		if (validNatInscNo) {
-			this.natInscNo = natInscNo;
-			return;
-		}
-		throw new InvalidNationalInsuranceException("Invalid national insurance number");
+		this.natInscNo = natInscNo;
 	}
 
 	/**
@@ -77,11 +71,14 @@ public class Person {
 	 * @param natInscNo String to validate.
 	 * @return true if string is valid national insurance number, false otherwise
 	 */
-	private boolean validateNIN(String natInscNo2) {
-		natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
+	private void validateNIN(String natInscNo) throws InvalidNationalInsuranceException{
 		Pattern NINPattern = Pattern.compile("^(?!BG|GB|NK|KN|TN|NT|ZZ)[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\\d{6}[A-D]$");
 		Matcher match = NINPattern.matcher(natInscNo);
-		return match.matches();
+		if(match.matches()) {
+			return;
+		} else {
+			throw new InvalidNationalInsuranceException("Invalid national insurance number");
+		}
 	}
 	
 
