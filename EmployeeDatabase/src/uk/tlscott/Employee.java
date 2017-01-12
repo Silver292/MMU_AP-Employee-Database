@@ -37,17 +37,25 @@ public class Employee extends Person {
 			this.dob = null;
 			return;
 		}
-		
+
 		LocalDate date = LocalDate.parse(dob, dateFormat);
-		
+
 		// check over minimum working age
-		if(underWorkingAge(date, this.startDate)) {
+		if(underWorkingAge(date, getStartDate())) {
 			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
 		}
-		
+
 		super.setDob(dob);
 	}
-	
+
+	// Checks that the employee is at least minimum working age. 
+	// Employees can start work on their birthday
+	private boolean underWorkingAge(LocalDate dob, LocalDate startDate) {
+		if(dob == null || startDate == null) return false; // can't check without both
+
+		return dob.isAfter(startDate.minusYears(MINIMUM_WORKING_AGE));
+	}
+
 	/**
 	 * @param id
 	 *            the id to set
@@ -55,7 +63,7 @@ public class Employee extends Person {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 
 	/**
 	 * @return the id
@@ -71,7 +79,7 @@ public class Employee extends Person {
 	public void setSalary(String salary) {
 		this.salary = salary;
 	}
-	
+
 
 	/**
 	 * @return the salary
@@ -91,17 +99,17 @@ public class Employee extends Person {
 			this.startDate = null;
 			return;
 		}
-		
+
 		LocalDate date = LocalDate.parse(startDate, dateFormat);
-				
+
 		// check over minimum working age
-		if(underWorkingAge(this.dob, date)) {
+		if(underWorkingAge(getDob(), date)) {
 			throw new UnderMinimumAgeException("Employees must be over " + MINIMUM_WORKING_AGE + " years old.");	
 		}
-		
+
 		this.startDate = date;
 	}
-	
+
 
 	/**
 	 * @return the startDate
@@ -117,7 +125,7 @@ public class Employee extends Person {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 
 	/**
 	 * @return the title
@@ -133,7 +141,7 @@ public class Employee extends Person {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	/**
 	 * @return the email
 	 */
@@ -152,7 +160,6 @@ public class Employee extends Person {
 	public boolean hasImage() {
 		return this.imageFile != null;
 	}
-	
 
 	/*
 	 * (non-Javadoc)
@@ -164,13 +171,4 @@ public class Employee extends Person {
 		return super.toString() + "\n\tI.D: " + id + "\n\tSalary: " + salary + "\n\tStart Date: " + startDate + "\n\tTitle: "
 				+ title + "\n\tEmail: " + email;
 	}
-
-	// Checks that the employee is at least minimum working age. 
-	// Employees can start work on their birthday
-	private boolean underWorkingAge(LocalDate dob, LocalDate startDate) {
-		if(dob == null || startDate == null) return false; // can't check without both
-		
-		return dob.isAfter(startDate.minusYears(MINIMUM_WORKING_AGE));
-	}
-	
 }
