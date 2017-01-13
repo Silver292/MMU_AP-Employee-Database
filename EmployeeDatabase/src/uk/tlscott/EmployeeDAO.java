@@ -16,17 +16,20 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+import uk.tlscott.exceptions.UnderMinimumAgeException;
+
 public class EmployeeDAO {
-	Connection c;
-	Statement s;
-	PreparedStatement pstmt;
-	ResultSet r;
-	
+	private Connection c;
+	private Statement s;
+	private PreparedStatement pstmt;
+	private ResultSet r;
+
 	// Logging variables
 	private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-	
+
 	public EmployeeDAO() {}
-	
+
 	public Connection getConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -34,17 +37,83 @@ public class EmployeeDAO {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error connecting to database", e);
 		}
-		
+
 		return c;
 	}
-	
+
+	// returns generated id
+	public int insertEmployee(Employee emp) {
+		int generatedKey = -1;
+
+		String sql = "INSERT INTO employees "
+				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
+				+ "VALUES "
+				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"; 
+		try {
+			this.getConnection();
+			pstmt = c.prepareStatement(sql);
+			setPreparedStatement(emp);
+			pstmt.executeUpdate();
+			r = pstmt.getGeneratedKeys();
+			if(r.next()){
+				generatedKey = r.getInt(1);
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error inserting employee", e);
+		} finally {
+			this.closeConnection();
+		}
+		return generatedKey;
+	}
+
+	/**
+	 * @param emp
+	 * @throws SQLException
+	 */
+	private void setPreparedStatement(Employee emp) throws SQLException {
+		pstmt.setString(1, emp.getName());
+		pstmt.setString(2, String.valueOf(emp.getGender()));
+		pstmt.setString(3, emp.getDob().toString());
+		pstmt.setString(4, emp.getAddress());
+		pstmt.setString(5, emp.getPostcode());
+		pstmt.setString(6, emp.getNatInscNo());
+		pstmt.setString(7, emp.getTitle());
+		pstmt.setString(8, emp.getStartDate().toString());
+		pstmt.setString(9, emp.getSalary());
+		pstmt.setString(10, emp.getEmail());
+		pstmt.setBytes(11, readFile(emp.getImageFile()));
+	}
+
+	/**
+	 * Read the file and returns the byte array
+	 * @param file
+	 * @return the bytes of the file
+	 */
+	private byte[] readFile(File file) {
+		if (file == null) return null;
+
+		ByteArrayOutputStream bos = null;
+		try ( FileInputStream fis = new FileInputStream(file)){
+			byte[] buffer = new byte[1024];
+			bos = new ByteArrayOutputStream();
+			for (int len; (len = fis.read(buffer)) != -1;) {
+				bos.write(buffer, 0, len);
+			}
+		} catch (FileNotFoundException e) {
+			LOGGER.log(Level.WARNING, "Error reading image file", e);
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Error reading image file", e);
+		}
+		return bos != null ? bos.toByteArray() : null;
+	}
+
 	public void closeConnection() {
 		closeQuietly(r);
 		closeQuietly(s);
 		closeQuietly(pstmt);
 		closeQuietly(c);
 	}
-	
+
 	/**
 	 * Closes an <code>AutoClosable</code> unequivocally.
 	 * <br>
@@ -60,52 +129,28 @@ public class EmployeeDAO {
 			// ignored
 		}
 	}
-	// returns generated id
-	public int insertEmployee(Employee emp) {
-		int generatedKey = 0;
-	
-		String sql = "INSERT INTO employees "
-				+ "(Name, Gender, DOB, Address, Postcode, NIN, JobTitle, StartDate, Salary, Email, Image) "
-				+ "VALUES "
-				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"; 
-		try {
-			this.getConnection();
-			pstmt = c.prepareStatement(sql);
-	        setPreparedStatement(emp);
-			pstmt.executeUpdate();
-			r = pstmt.getGeneratedKeys();
-			if(r.next()){
-				generatedKey = r.getInt(1);
-			}
-		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, "Error inserting employee", e);
-		} finally {
-			this.closeConnection();
-		}
-		return generatedKey;
-	}
 
 	public boolean updateEmployee(Employee emp) {
 		String sql = "UPDATE employees SET "
 				+ "Name = ?, "
-	            + "Gender = ?, "
-	            + "DOB = ?, "
-	            + "Address = ?, "
-	            + "Postcode = ?, "
-	            + "NIN = ?, "
-	            + "JobTitle = ?, "
-	            + "StartDate = ?, "
-	            + "Salary = ?, "
-	            + "Email = ?, "
-	            + "Image = ? "
-	            + "WHERE ID = ?;";
+				+ "Gender = ?, "
+				+ "DOB = ?, "
+				+ "Address = ?, "
+				+ "Postcode = ?, "
+				+ "NIN = ?, "
+				+ "JobTitle = ?, "
+				+ "StartDate = ?, "
+				+ "Salary = ?, "
+				+ "Email = ?, "
+				+ "Image = ? "
+				+ "WHERE ID = ?;";
 		// convert string id to an integer for use with database
 		int idAsInt = Integer.parseInt(emp.getId());
 		try {
 			this.getConnection();
 			pstmt = c.prepareStatement(sql);
-	        setPreparedStatement(emp);
-	        pstmt.setInt(12, idAsInt);
+			setPreparedStatement(emp);
+			pstmt.setInt(12, idAsInt);
 			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -125,26 +170,26 @@ public class EmployeeDAO {
 			while(r.next()) {
 				employees.add(setEmployeeFields());
 			}
-			
+
 			this.closeConnection();
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, "Error selecting all employees", e);
 			return null;
 		}
-		
+
 		return employees;
 	}
 
 	public Employee selectEmployeeByName(String name) {
 		String sqlStatement = "SELECT * FROM employees WHERE Name = ?";
 		Employee emp = null;
-		
+
 		try {
 			this.getConnection();
 			pstmt = c.prepareStatement(sqlStatement);
 			pstmt.setString(1,  name);
 			r = pstmt.executeQuery();
-			
+
 			while(r.next()) {
 				emp = setEmployeeFields();
 			}
@@ -155,17 +200,17 @@ public class EmployeeDAO {
 		}
 		return emp;
 	}
-	
+
 	public Employee selectEmployeeById(int id) {
 		String sql = "SELECT * FROM employees WHERE ID = ?";
 		Employee emp = null;
-		
+
 		try {
 			this.getConnection();		
 			pstmt = c.prepareStatement(sql);
 			pstmt.setInt(1, id);
 			r = pstmt.executeQuery();
-			
+
 			if (r.next()) {
 				emp = setEmployeeFields();
 			}
@@ -193,7 +238,7 @@ public class EmployeeDAO {
 		} finally {
 			this.closeConnection();
 		}
-		
+
 		return emp;
 	}
 
@@ -206,17 +251,17 @@ public class EmployeeDAO {
 	 */
 	public Employee getNextEmployee(String id) {
 		int idAsInt = Integer.parseInt(id);
-	
+
 		// check if there are any records with an id higher than current.
 		String sql = "SELECT COUNT(*) AS count FROM employees WHERE ID > ?;";
-		
+
 		Employee emp = null;
 		try {
 			this.getConnection();		
 			pstmt = c.prepareStatement(sql);
 			pstmt.setInt(1, idAsInt);
 			r = pstmt.executeQuery();
-	
+
 			// if count > 0 get next employee
 			int count = r.getInt("count");
 			if (count > 0 ) {
@@ -230,7 +275,7 @@ public class EmployeeDAO {
 				s = c.createStatement();
 				r = s.executeQuery(sql);
 			}
-	
+
 			// fill in employee information
 			if (r.next()) {
 				emp = setEmployeeFields();
@@ -244,71 +289,6 @@ public class EmployeeDAO {
 	}
 
 	/**
-	 * Selects previous employee in table based on employee id.
-	 * <br>
-	 * If at the beginning of the table will wrap around and return the last employee in the table.
-	 * @param id of the current employee.
-	 * @return Employee previous employee in the table or last employee if there are no lower ids.
-	 */
-	public Employee getPreviousEmployee(String id) {
-		int idAsInt = Integer.parseInt(id);
-	
-		// check if there are any records with an id lower than current.
-		String sql = "SELECT COUNT(*) AS count FROM employees WHERE ID < ?;";
-		
-		Employee emp = null;
-		try {
-			this.getConnection();		
-			pstmt = c.prepareStatement(sql);
-			pstmt.setInt(1, idAsInt);
-			r = pstmt.executeQuery();
-	
-			// if count > 0 get previous employee
-			int count = r.getInt("count");
-			if (count > 0 ) {
-				sql = "SELECT * FROM employees WHERE ID < ? ORDER BY ID DESC LIMIT 1;";
-				pstmt = c.prepareStatement(sql);
-				pstmt.setInt(1, idAsInt);
-				r = pstmt.executeQuery();
-			} else {
-				// otherwise wrap around
-				sql = "SELECT * FROM employees WHERE id = (SELECT MAX(ID) FROM employees);";
-				s = c.createStatement();
-				r = s.executeQuery(sql);
-			}
-	
-			// fill in employee information
-			if (r.next()) {
-				emp = setEmployeeFields();
-			}
-		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, "Error selecting employee id: " + id, e);
-		} finally {
-			this.closeConnection();
-		}
-		return emp;
-	}
-
-	public boolean deleteEmployeeById(String id) {
-		int idAsInt = Integer.parseInt(id);
-		String sql = "DELETE FROM employees WHERE ID = ?;";
-		
-		try {
-			this.getConnection();
-			pstmt = c.prepareStatement(sql);
-			pstmt.setInt(1, idAsInt);
-			pstmt.execute();
-			return true;
-		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, "Error deleting employee id: " + id, e);
-			return false;
-		} finally {
-			this.closeConnection();
-		}
-		
-	}
-	
-/**
 	 * @return
 	 * @throws SQLException
 	 */
@@ -341,135 +321,170 @@ public class EmployeeDAO {
 	 * @param emp
 	 * @throws SQLException
 	 */
-	private void setPreparedStatement(Employee emp) throws SQLException {
-		pstmt.setString(1, emp.getName());
-		pstmt.setString(2, String.valueOf(emp.getGender()));
-		pstmt.setString(3, emp.getDob().toString());
-		pstmt.setString(4, emp.getAddress());
-		pstmt.setString(5, emp.getPostcode());
-		pstmt.setString(6, emp.getNatInscNo());
-		pstmt.setString(7, emp.getTitle());
-		pstmt.setString(8, emp.getStartDate().toString());
-		pstmt.setString(9, emp.getSalary());
-		pstmt.setString(10, emp.getEmail());
-        pstmt.setBytes(11, readFile(emp.getImageFile()));
-	}
-
-	/**
-	 * @param emp
-	 * @throws SQLException
-	 */
 	private File getImageFile(Employee emp) throws SQLException {
-		File file = new File("./assets/empImage" + emp.getId() + ".jpg");
-		
-		try (FileOutputStream fos = new FileOutputStream(file)){
-			InputStream input = r.getBinaryStream("Image");
-			if(input != null) {
+		File file = null;
+		InputStream inputStream = r.getBinaryStream("Image");
+
+		if (inputStream != null) {
+			file = new File("./assets/empImage" + emp.getId() + ".jpg");
+
+			try (FileOutputStream fos = new FileOutputStream(file)){
 				// write to file from database
 				byte[] buffer = new byte[1024];
-				while (input.read(buffer) > 0) {
+				while (inputStream.read(buffer) > 0) {
 					fos.write(buffer);
 				}
-				return file;
-			} 
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Error creating tempory image file", e);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, "Error creating tempory image file", e);
+			}
 		}
-	
-		return null;
+
+		return file;
 	}
 
 	/**
-     * Read the file and returns the byte array
-     * @param file
-     * @return the bytes of the file
-     */
-    private byte[] readFile(File file) {
-    	if (file == null) return null;
-    	
-        ByteArrayOutputStream bos = null;
-        try ( FileInputStream fis = new FileInputStream(file)){
-            byte[] buffer = new byte[1024];
-            bos = new ByteArrayOutputStream();
-            for (int len; (len = fis.read(buffer)) != -1;) {
-                bos.write(buffer, 0, len);
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.log(Level.WARNING, "Error reading image file", e);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error reading image file", e);
-        }
-        return bos != null ? bos.toByteArray() : null;
-    }
+	 * Selects previous employee in table based on employee id.
+	 * <br>
+	 * If at the beginning of the table will wrap around and return the last employee in the table.
+	 * @param id of the current employee.
+	 * @return Employee previous employee in the table or last employee if there are no lower ids.
+	 */
+	public Employee getPreviousEmployee(String id) {
+		int idAsInt = Integer.parseInt(id);
 
-    public ArrayList<Employee> searchByID(String id) {
-    	ArrayList<Employee> employees = new ArrayList<Employee>();
-    	id = String.format("%%%s%%", id);
-    	String sql = "SELECT * FROM employees WHERE ID LIKE ?;";
-    	try {
-    		this.getConnection();       
-    		pstmt = c.prepareStatement(sql);
-    		pstmt.setString(1, id);
-    		r = pstmt.executeQuery();
+		// check if there are any records with an id lower than current.
+		String sql = "SELECT COUNT(*) AS count FROM employees WHERE ID < ?;";
 
-    		while (r.next()) {
-    			Employee emp = null;
-    			emp = setEmployeeFields();
-    			employees.add(emp);
-    		}
-    	} catch (SQLException e) {
-    		LOGGER.log(Level.WARNING, "Error searching for employee id: " + id, e);
-    	} finally {
-    		this.closeConnection();
-    	}
-    	return employees;
-    }
+		Employee emp = null;
+		try {
+			this.getConnection();		
+			pstmt = c.prepareStatement(sql);
+			pstmt.setInt(1, idAsInt);
+			r = pstmt.executeQuery();
 
-    public ArrayList<Employee> searchByName(String name) {
-    	ArrayList<Employee> employees = new ArrayList<Employee>();
-    	name = String.format("%%%s%%", name);
-    	String sql = "SELECT * FROM employees WHERE Name LIKE ?;";
-    	try {
-    		this.getConnection();       
-    		pstmt = c.prepareStatement(sql);
-    		pstmt.setString(1, name);
-    		r = pstmt.executeQuery();
+			// if count > 0 get previous employee
+			int count = r.getInt("count");
+			if (count > 0 ) {
+				sql = "SELECT * FROM employees WHERE ID < ? ORDER BY ID DESC LIMIT 1;";
+				pstmt = c.prepareStatement(sql);
+				pstmt.setInt(1, idAsInt);
+				r = pstmt.executeQuery();
+			} else {
+				// otherwise wrap around
+				sql = "SELECT * FROM employees WHERE id = (SELECT MAX(ID) FROM employees);";
+				s = c.createStatement();
+				r = s.executeQuery(sql);
+			}
 
-    		while (r.next()) {
-    			Employee emp = null;
-    			emp = setEmployeeFields();
-    			employees.add(emp);
-    		}
-    	} catch (SQLException e) {
-    		LOGGER.log(Level.WARNING, "Error searching for employee name: " + name, e);
-    	} finally {
-    		this.closeConnection();
-    	}
-    	return employees;
-    }
+			// fill in employee information
+			if (r.next()) {
+				emp = setEmployeeFields();
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error selecting employee id: " + id, e);
+		} finally {
+			this.closeConnection();
+		}
+		return emp;
+	}
 
-    public ArrayList<Employee> searchByNameAndID(String name, String id) {
-    	ArrayList<Employee> employees = new ArrayList<Employee>();
-    	name = String.format("%%%s%%", name);
-    	id = String.format("%%%s%%", id);
-    	String sql = "SELECT * FROM employees WHERE Name LIKE ? OR ID LIKE ?;";
-    	try {
-    		this.getConnection();       
-    		pstmt = c.prepareStatement(sql);
-    		pstmt.setString(1, name);
-    		pstmt.setString(2, id);
-    		r = pstmt.executeQuery();
+	public boolean deleteEmployeeById(String id) {
+		int idAsInt = Integer.parseInt(id);
+		String sql = "DELETE FROM employees WHERE ID = ?;";
 
-    		while (r.next()) {
-    			Employee emp = null;
-    			emp = setEmployeeFields();
-    			employees.add(emp);
-    		}
-    	} catch (SQLException e) {
-    		LOGGER.log(Level.WARNING, "Error searching for employee name: " + name + " id:" + id, e);
-    	} finally {
-    		this.closeConnection();
-    	}
-    	return employees;
-    }
+		try {
+			this.getConnection();
+			pstmt = c.prepareStatement(sql);
+			pstmt.setInt(1, idAsInt);
+			pstmt.execute();
+			return true;
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error deleting employee id: " + id, e);
+			return false;
+		} finally {
+			this.closeConnection();
+		}
+
+	}
+
+	public ArrayList<Employee> searchByID(String id) {
+		ArrayList<Employee> employees = new ArrayList<Employee>();
+		id = String.format("%%%s%%", id);
+		String sql = "SELECT * FROM employees WHERE ID LIKE ?;";
+		try {
+			this.getConnection();       
+			pstmt = c.prepareStatement(sql);
+			pstmt.setString(1, id);
+			r = pstmt.executeQuery();
+
+			while (r.next()) {
+				Employee emp = null;
+				emp = setEmployeeFields();
+				employees.add(emp);
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error searching for employee id: " + id, e);
+		} finally {
+			this.closeConnection();
+		}
+		return employees;
+	}
+
+	public ArrayList<Employee> searchByName(String name) {
+		ArrayList<Employee> employees = new ArrayList<Employee>();
+		name = String.format("%%%s%%", name);
+		String sql = "SELECT * FROM employees WHERE Name LIKE ?;";
+		try {
+			this.getConnection();       
+			pstmt = c.prepareStatement(sql);
+			pstmt.setString(1, name);
+			r = pstmt.executeQuery();
+
+			while (r.next()) {
+				Employee emp = null;
+				emp = setEmployeeFields();
+				employees.add(emp);
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error searching for employee name: " + name, e);
+		} finally {
+			this.closeConnection();
+		}
+		return employees;
+	}
+
+	public ArrayList<Employee> searchByNameAndID(String name, String id) {
+		ArrayList<Employee> employees = new ArrayList<Employee>();
+		name = String.format("%%%s%%", name);
+		id = String.format("%%%s%%", id);
+		String sql = "SELECT * FROM employees WHERE Name LIKE ? OR ID LIKE ?;";
+		try {
+			this.getConnection();       
+			pstmt = c.prepareStatement(sql);
+			pstmt.setString(1, name);
+			pstmt.setString(2, id);
+			r = pstmt.executeQuery();
+
+			while (r.next()) {
+				Employee emp = null;
+				emp = setEmployeeFields();
+				employees.add(emp);
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error searching for employee name: " + name + " id:" + id, e);
+		} finally {
+			this.closeConnection();
+		}
+		return employees;
+	}
+
+	public boolean isClosed(){
+		boolean allClosed = false;
+		try {
+			allClosed = r.isClosed() && c.isClosed() && s.isClosed() && pstmt.isClosed();
+		} catch (SQLException e) {
+			LOGGER.log(Level.WARNING, "Error checking for closed connection", e);
+		} 
+		return allClosed;
+	}
 }

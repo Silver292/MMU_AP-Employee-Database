@@ -7,7 +7,7 @@ public class ControllerGUI {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				MainForm frame = new MainForm();
+				MainFrame frame = new MainFrame();
 		
 				frame.setVisible(true);
 			}

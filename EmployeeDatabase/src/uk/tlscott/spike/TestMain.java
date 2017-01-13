@@ -3,6 +3,8 @@ package uk.tlscott.spike;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import uk.tlscott.SearchPanel;
+
 public class TestMain {
 
 	public static void main(String[] args) {

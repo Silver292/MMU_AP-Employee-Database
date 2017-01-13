@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+
 public class Person {
 	private String name;
 	private char gender;
@@ -47,26 +49,40 @@ public class Person {
 		return gender;
 	}
 
+	
 	/**
-	 * @param natInscNo the natInscNo to set
+	 * Sets the national insurance number of the person.
+	 * <br>
+	 * Throws exception if national insurance number is invalid.
+	 * 
+	 * @param natInscNo	national insurance number to set.
+	 * @throws InvalidNationalInsuranceException if passed an invalid NIN.
 	 */
 	public void setNatInscNo(String natInscNo) throws InvalidNationalInsuranceException{
-		// Allow field to be null or empty string
-		if (natInscNo == null || natInscNo.equals("")) {
-			this.natInscNo = natInscNo;
-			return;
+		boolean hasText = natInscNo != null && !natInscNo.isEmpty();
+		if (hasText) {
+			natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
+			validateNIN(natInscNo);
 		}
-		
-		// Validate national insurance number
-		natInscNo = natInscNo.trim().toUpperCase().replace(" ", "");
+		this.natInscNo = natInscNo;
+	}
+
+	/**
+	 * Validates national insurance number.
+	 * 
+	 * @param natInscNo String to validate.
+	 * @return true if string is valid national insurance number, false otherwise
+	 */
+	private void validateNIN(String natInscNo) throws InvalidNationalInsuranceException{
 		Pattern NINPattern = Pattern.compile("^(?!BG|GB|NK|KN|TN|NT|ZZ)[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\\d{6}[A-D]$");
 		Matcher match = NINPattern.matcher(natInscNo);
-		if (match.matches()) {
-			this.natInscNo = natInscNo;
+		if(match.matches()) {
 			return;
+		} else {
+			throw new InvalidNationalInsuranceException("Invalid national insurance number");
 		}
-		throw new InvalidNationalInsuranceException("Invalid national insurance number");
 	}
+	
 
 	/**
 	 * @return the natInscNo

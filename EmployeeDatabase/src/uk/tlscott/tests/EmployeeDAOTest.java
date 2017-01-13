@@ -1,34 +1,31 @@
-package uk.tlscott;
+package uk.tlscott.tests;
 import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+
 import org.dbunit.IDatabaseTester;
 import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import uk.tlscott.Employee;
+import uk.tlscott.EmployeeDAO;
 
 public class EmployeeDAOTest {
 
-	private EmployeeDAO db;
-	private IDatabaseTester databaseTester;
+	private static EmployeeDAO db;
+	private static IDatabaseTester databaseTester;
 	
-	@Before
-	public void setUp() throws Exception{
-		// Initialise your database connection here
+	@BeforeClass
+	public static void setUp() throws Exception{
 		Class.forName("org.sqlite.JDBC");
 		databaseTester = new JdbcDatabaseTester("org.sqlite.JDBC", "jdbc:sqlite:empdb.sqlite");
-
-		// Initialise your data set here
 		IDataSet dataSet = new FlatXmlDataSetBuilder().build(new FileInputStream("testdb.xml"));
-		// ...
-
-		databaseTester.setDataSet( dataSet );
-		// will call default setUpOperation
+		databaseTester.setDataSet(dataSet);
 		databaseTester.onSetup();
-		
 		db = new EmployeeDAO();
 	}
 
@@ -69,7 +66,7 @@ public class EmployeeDAOTest {
 	public void employeeInsertionAddsEmployee() throws Exception {
 		Employee newEmp = getTestEmployee();
 		
-		assertNotEquals(0, db.insertEmployee(newEmp));
+		assertNotEquals(-1, db.insertEmployee(newEmp));
 		Employee tempEmp = db.selectEmployeeByName(newEmp.getName());
 		assertEquals("selected employee name matches", newEmp.getName(), tempEmp.getName());
 	}
@@ -90,10 +87,7 @@ public class EmployeeDAOTest {
 		Employee emp = db.selectEmployeeById(1);
 		@SuppressWarnings("unused")
 		ArrayList<Employee> employees = db.selectAllEmployees();
-		assertTrue("result set should be closed", db.r.isClosed());
-		assertTrue("statement should be closed", db.s.isClosed());
-		assertTrue("prepared statement should be closed", db.pstmt.isClosed());
-		assertTrue("connection should be closed", db.c.isClosed());
+		assertTrue("connection should be closed", db.isClosed());
 	}
 	
 	@Test
@@ -123,10 +117,11 @@ public class EmployeeDAOTest {
 		return testEmp;
 	}
 
-	public void tearDown() throws Exception
+	@AfterClass
+	public static void tearDown() throws Exception
 	{
-		// will call default tearDownOperation
 	    databaseTester.onTearDown();
 	    db.closeConnection();
 	}
+
 }

@@ -12,17 +12,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import uk.tlscott.spike.SearchPanel;
-
-public class MainForm extends JFrame{
+public class MainFrame extends JFrame{
 
 	protected EmployeeDAO dao = new EmployeeDAO();
-	private EmployeeUpdatePanel employeePanel;
+	private EmployeeRecordPanel employeePanel;
 	private ViewController controller;
 	
 	private static final long serialVersionUID = 1L;
 
-	public MainForm() {
+	public MainFrame() {
 		super("Employee Record System");
 
 		setSize(665, 425);
@@ -34,7 +32,7 @@ public class MainForm extends JFrame{
 		
 		add(pane);
 		
-		setUpMenu();
+		setUpMenuBar();
 	}
 
 	/**
@@ -45,7 +43,7 @@ public class MainForm extends JFrame{
 		
 		pane.setLayout(cardLayout);
 
-		employeePanel = new EmployeeUpdatePanel(dao);
+		employeePanel = new EmployeeRecordPanel(dao);
 		SearchPanel searchPane = new SearchPanel();
 				
 		controller = new ViewController(pane, cardLayout);
@@ -56,21 +54,29 @@ public class MainForm extends JFrame{
 		controller.showRecordOf(dao.selectFirstEmployee());
 	}
 
-	/**
-	 * 
-	 */
-	private void setUpMenu() {
-		// menu setup
+	private void setUpMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu   = new JMenu("File");
 		JMenu recordMenu = new JMenu("Record");
+		
+		setUpFileMenu(fileMenu);
+		setUpRecordMenu(recordMenu);
+		
+		menuBar.add(fileMenu);
+		menuBar.add(recordMenu);
+		
+		setJMenuBar(menuBar);
+	}
+	
+	private void setUpFileMenu(JMenu fileMenu) {
 		JMenuItem exitItem = new JMenuItem("Exit");
-		JMenuItem displayItem = new JMenuItem("Display");
-		JMenuItem addFileItem = new JMenuItem("Add Image");
-		JMenuItem showSearch = new JMenuItem("Search");
 		
+		addExitItemListener(exitItem);
 		
-		// Add exit item to file menu
+		fileMenu.add(exitItem);
+	}
+
+	private void addExitItemListener(JMenuItem exitItem) {
 		exitItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", 
@@ -80,40 +86,39 @@ public class MainForm extends JFrame{
 					System.exit(0);
 			}
 		});
+	}
+
+	private void setUpRecordMenu(JMenu recordMenu) {
+		JMenuItem displayItem = new JMenuItem("Display");
+		JMenuItem addFileItem = new JMenuItem("Add Image");
+		JMenuItem searchItem = new JMenuItem("Search");
 		
+		addDisplayItemListener(displayItem);
+		addSearchListener(searchItem);
+		addFileItemListener(addFileItem);
 		
-		// Add display item to the Record menus
+		recordMenu.add(displayItem);
+		recordMenu.add(searchItem);
+		recordMenu.add(addFileItem);
+	}
+
+
+	private void addDisplayItemListener(JMenuItem displayItem) {
 		displayItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Employee employee = dao.selectFirstEmployee();
 				
-				// show error if one has occured
-				if (employee == null) {
-					JOptionPane.showMessageDialog(null, "There was a getting the first employee", "Database Error", JOptionPane.ERROR_MESSAGE);
+				boolean errorGettingEmployee = employee == null;
+				if (errorGettingEmployee) {
+					JOptionPane.showMessageDialog(null, "There was a problem getting the first employee", "Database Error", JOptionPane.ERROR_MESSAGE);
 				}
 				
 				controller.showRecordOf(employee);
 			}
 		});
-		
-		// Add an image to employee record
-		addFileItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// set up file chooser
-				JFileChooser chooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
-				chooser.setFileFilter(filter);
-				chooser.setDialogTitle("Add Image");
-				
-				int returnVal = chooser.showOpenDialog(null);
-				
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					employeePanel.setImage(chooser.getSelectedFile());
-				}
-			}
-		});
-		
+	}
+
+	private void addSearchListener(JMenuItem showSearch) {
 		showSearch.addActionListener(new ActionListener() {
 			
 			@Override
@@ -121,17 +126,40 @@ public class MainForm extends JFrame{
 				controller.showSearchView();
 			}
 		});
-		
-		fileMenu.add(exitItem);
-		
-		recordMenu.add(displayItem);
-		recordMenu.add(showSearch);
-		recordMenu.add(addFileItem);
-		
-		menuBar.add(fileMenu);
-		menuBar.add(recordMenu);
-		
-		setJMenuBar(menuBar);
+	}
+
+	private void addFileItemListener(JMenuItem addFileItem) {
+		addFileItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(employeePanel.isVisible()) {
+					createFileChooser();
+
+				} else {
+					JOptionPane.showMessageDialog(null, "To add image to employee go to Record -> Display", "Image Error", JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+
+			private void createFileChooser() {
+				JFileChooser chooser = new JFileChooser();
+				setFilters(chooser);
+				chooser.setDialogTitle("Add Image");
+
+				int returnVal = chooser.showOpenDialog(null);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					employeePanel.setImage(chooser.getSelectedFile());
+				}
+			}
+
+			private void setFilters(JFileChooser chooser) {
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
+				chooser.setFileFilter(filter);
+				chooser.setAcceptAllFileFilterUsed(false);
+			}
+		});
 	}
 
 }
