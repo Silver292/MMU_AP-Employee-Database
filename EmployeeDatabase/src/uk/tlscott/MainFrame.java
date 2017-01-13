@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class MainForm extends JFrame{
+public class MainFrame extends JFrame{
 
 	protected EmployeeDAO dao = new EmployeeDAO();
 	private EmployeeRecordPanel employeePanel;
@@ -20,7 +20,7 @@ public class MainForm extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 
-	public MainForm() {
+	public MainFrame() {
 		super("Employee Record System");
 
 		setSize(665, 425);
