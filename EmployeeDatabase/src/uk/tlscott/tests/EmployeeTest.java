@@ -8,8 +8,8 @@ import java.time.format.DateTimeFormatter;
 import org.junit.Test;
 
 import uk.tlscott.Employee;
-import uk.tlscott.InvalidNationalInsuranceException;
-import uk.tlscott.UnderMinimumAgeException;
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+import uk.tlscott.exceptions.UnderMinimumAgeException;
 
 public class EmployeeTest {
 

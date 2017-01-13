@@ -3,6 +3,8 @@ package uk.tlscott;
 import java.io.File;
 import java.time.LocalDate;
 
+import uk.tlscott.exceptions.UnderMinimumAgeException;
+
 public class Employee extends Person {
 
 	private static final long MINIMUM_WORKING_AGE = 16;

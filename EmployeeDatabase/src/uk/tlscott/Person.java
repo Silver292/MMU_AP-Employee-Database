@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+
 public class Person {
 	private String name;
 	private char gender;

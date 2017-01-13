@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+import uk.tlscott.exceptions.UnderMinimumAgeException;
+
 public class EmployeeDAO {
 	private Connection c;
 	private Statement s;

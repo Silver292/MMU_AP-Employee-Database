@@ -19,6 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import uk.tlscott.exceptions.InvalidNationalInsuranceException;
+import uk.tlscott.exceptions.UnderMinimumAgeException;
+
 public class EmployeeRecordPanel extends JPanel{
 	private static final long serialVersionUID = -5570407357068482978L;
 	
