@@ -2,5 +2,5 @@
 <dataset>
   <employees ID="1" Name="Alan Crispin" Gender="M" DOB="1960-03-14" Address="Leeds" Postcode="LS1 1HE" NIN="LR338036D" JobTitle="Lecturer" StartDate="2010-09-01" Salary="30000" Email="alan@example.com"/>
   <employees ID="2" Name="Fred Bloggs" Gender="M" DOB="1986-05-10" Address="Manchester" Postcode="M34 8SL" NIN="TX339203D" JobTitle="IT" StartDate="2014-03-08" Salary="16000" Email="fred@example.com"/>
-  <employees ID="8" Name="Mary Poppins" Gender="F" DOB="1949-01-01" Address="London" Postcode="SW1 6MP&#xA;SW1 6MP" NIN="TX339203D" JobTitle="Governess" StartDate="1969-01-01" Salary="1000" Email="mary@example.com"/>
+  <employees ID="8" Name="Mary Poppins" Gender="F" DOB="1949-01-01" Address="London" Postcode="SW1 6MP" NIN="TX339203D" JobTitle="Governess" StartDate="1969-01-01" Salary="1000" Email="mary@example.com"/>
 </dataset>
